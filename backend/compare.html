@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare AI Tools - AIDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#0a2461',
+                        'secondary': '#3E92CC',
+                        'bg-dark': '#0a0d14',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1px;
+            background: #1f2937;
+        }
+        .comparison-cell {
+            background: #0f172a;
+            padding: 1.5rem 1rem;
+        }
+        .comparison-header {
+            background: #1a1f2e;
+        }
+    </style>
+</head>
+<body class="bg-bg-dark text-white min-h-screen">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 backdrop-blur-md bg-bg-dark/80 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center gap-4">
+                <button onclick="history.back()" class="text-2xl hover:text-secondary">←</button>
+                <h1 class="text-xl font-bold">Compare AI</h1>
+            </div>
+            <button onclick="addToolToCompare()" class="bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                <span class="material-icons text-sm">add</span>
+                Add Tool
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Tool Selector -->
+    <div id="toolSelector" class="hidden mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700">
+        <h3 class="text-lg font-bold mb-4">Select Tools to Compare</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="toolList">
+            <!-- Will be populated dynamically -->
+        </div>
+        <div class="mt-4 flex justify-end gap-3">
+            <button onclick="closeSelector()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700">Cancel</button>
+            <button onclick="compareSelected()" class="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold">Compare</button>
+        </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div id="comparisonContainer" class="overflow-x-auto">
+        <div class="text-center text-gray-500 py-20">
+            <span class="material-icons text-6xl mb-4">compare_arrows</span>
+            <p class="text-xl font-semibold mb-2">No tools selected</p>
+            <p class="text-sm">Click "Add Tool" to start comparing AI tools</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div id="actionButtons" class="hidden mt-8 flex justify-end gap-4">
+        <button onclick="shareComparison()" class="px-6 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 font-semibold flex items-center gap-2">
+            <span class="material-icons text-sm">share</span>
+            Share Comparison
+        </button>
+        <button onclick="exportPDF()" class="px-6 py-3 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold flex items-center gap-2">
+            <span class="material-icons text-sm">download</span>
+            Export Report (PDF)
+        </button>
+    </div>
+
+</main>
+
+<script>
+const API_URL = 'http://localhost:8000';
+let selectedTools = [];
+let comparisonTools = [];
+
+async function addToolToCompare() {
+    document.getElementById('toolSelector').classList.remove('hidden');
+    await loadAvailableTools();
+}
+
+function closeSelector() {
+    document.getElementById('toolSelector').classList.add('hidden');
+}
+
+async function loadAvailableTools() {
+    try {
+        const response = await fetch(`${API_URL}/api/rankings?query=machine-learning&limit=20`);
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            const toolList = document.getElementById('toolList');
+            toolList.innerHTML = data.data.map((tool, idx) => `
+                <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-700 hover:border-secondary cursor-pointer transition">
+                    <input type="checkbox" value="${idx}" onchange="toggleTool(${idx}, this.checked)" 
+                           class="w-4 h-4 text-secondary bg-gray-700 border-gray-600 rounded focus:ring-secondary">
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm">${tool.name}</div>
+                        <div class="text-xs text-gray-400">${tool.language || 'AI Tool'}</div>
+                    </div>
+                </label>
+            `).join('');
+            
+            // Store tools for later reference
+            window.availableTools = data.data;
+        }
+    } catch (error) {
+        console.error('Error loading tools:', error);
+    }
+}
+
+function toggleTool(idx, checked) {
+    if (checked && !selectedTools.includes(idx)) {
+        selectedTools.push(idx);
+    } else {
+        selectedTools = selectedTools.filter(i => i !== idx);
+    }
+}
+
+function compareSelected() {
+    if (selectedTools.length === 0) {
+        alert('Please select at least 1 tool to compare');
+        return;
+    }
+    
+    if (selectedTools.length > 4) {
+        alert('Maximum 4 tools can be compared at once');
+        return;
+    }
+    
+    comparisonTools = selectedTools.map(idx => window.availableTools[idx]);
+    renderComparison();
+    closeSelector();
+    selectedTools = [];
+}
+
+function renderComparison() {
+    if (comparisonTools.length === 0) return;
+    
+    const container = document.getElementById('comparisonContainer');
+    document.getElementById('actionButtons').classList.remove('hidden');
+    
+    const colors = ['#06B6D4', '#8B5CF6', '#F59E0B'];
+    
+    container.innerHTML = `
+        <div class="comparison-grid min-w-max">
+            
+            <!-- Header Row -->
+            <div class="comparison-cell comparison-header"></div>
+            ${comparisonTools.map((tool, idx) => `
+                <div class="comparison-cell comparison-header text-center">
+                    <button onclick="removeTool(${idx})" class="float-right text-gray-500 hover:text-red-500">
+                        <span class="material-icons text-sm">close</span>
+                    </button>
+                    <div class="w-16 h-16 rounded-xl mx-auto mb-3 flex items-center justify-center text-3xl" 
+                         style="background: ${colors[idx % colors.length]}">
+                        ${tool.name.substring(0, 1)}
+                    </div>
+                    <h3 class="font-bold text-lg">${tool.name}</h3>
+                    <p class="text-sm text-gray-400">${tool.full_name ? tool.full_name.split('/')[0] : 'GitHub'}</p>
+                </div>
+            `).join('')}
+            
+            <!-- Best For Row -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400 uppercase">Best For</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="text-sm">${tool.language ? `${tool.language} Development` : 'General Purpose'}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Pros Section -->
+            <div class="comparison-cell bg-gray-900">
+                <div class="text-sm font-bold text-blue-400">PROS</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell bg-gray-900">
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            <span>High community engagement</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            <span>${(tool.stars || 0).toLocaleString()} GitHub stars</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            <span>Active development</span>
+                        </li>
+                    </ul>
+                </div>
+            `).join('')}
+            
+            <!-- Cons Section -->
+            <div class="comparison-cell bg-gray-900">
+                <div class="text-sm font-bold text-red-400">CONS</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell bg-gray-900">
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500">•</span>
+                            <span>Learning curve for beginners</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500">•</span>
+                            <span>Documentation could be better</span>
+                        </li>
+                    </ul>
+                </div>
+            `).join('')}
+            
+            <!-- Technical Specs Header -->
+            <div class="comparison-cell bg-gray-800">
+                <div class="text-sm font-bold text-blue-400">TECHNICAL SPECS</div>
+            </div>
+            ${comparisonTools.map(() => `<div class="comparison-cell bg-gray-800"></div>`).join('')}
+            
+            <!-- Stars -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">GitHub Stars</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="font-semibold">${(tool.stars || 0).toLocaleString()}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Forks -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">Forks</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="font-semibold">${(tool.forks || 0).toLocaleString()}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Language -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">Language</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="font-semibold">${tool.language || 'Multiple'}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Score -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">AI Score</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 bg-gray-700 h-2 rounded-full overflow-hidden">
+                            <div class="bg-secondary h-full" style="width: ${(tool.BoostedScore * 100)}%"></div>
+                        </div>
+                        <span class="font-bold text-sm">${(tool.BoostedScore * 10).toFixed(1)}/10</span>
+                    </div>
+                </div>
+            `).join('')}
+            
+            <!-- Ecosystem Section -->
+            <div class="comparison-cell bg-gray-800">
+                <div class="text-sm font-bold text-blue-400">ECOSYSTEM & SECURITY</div>
+            </div>
+            ${comparisonTools.map(() => `<div class="comparison-cell bg-gray-800"></div>`).join('')}
+            
+            <!-- Contributors -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">Contributors</div>
+            </div>
+            ${comparisonTools.map(tool => `
+                <div class="comparison-cell">
+                    <div class="font-semibold">${tool.contributors_count || 'N/A'}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Open Source -->
+            <div class="comparison-cell">
+                <div class="text-sm font-semibold text-gray-400">Open Source</div>
+            </div>
+            ${comparisonTools.map(() => `
+                <div class="comparison-cell">
+                    <span class="material-icons text-green-500">check_circle</span>
+                </div>
+            `).join('')}
+            
+        </div>
+    `;
+}
+
+function removeTool(idx) {
+    comparisonTools.splice(idx, 1);
+    if (comparisonTools.length === 0) {
+        document.getElementById('comparisonContainer').innerHTML = `
+            <div class="text-center text-gray-500 py-20">
+                <span class="material-icons text-6xl mb-4">compare_arrows</span>
+                <p class="text-xl font-semibold mb-2">No tools selected</p>
+                <p class="text-sm">Click "Add Tool" to start comparing AI tools</p>
+            </div>
+        `;
+        document.getElementById('actionButtons').classList.add('hidden');
+    } else {
+        renderComparison();
+    }
+}
+
+function shareComparison() {
+    const toolNames = comparisonTools.map(t => t.name).join(' vs ');
+    if (navigator.share) {
+        navigator.share({
+            title: `AI Tool Comparison: ${toolNames}`,
+            text: `Check out this comparison of ${toolNames}`,
+            url: window.location.href
+        });
+    } else {
+        alert(`Share this URL:\n${window.location.href}`);
+    }
+}
+
+function exportPDF() {
+    alert('PDF export feature - In a real app, this would generate a PDF report of the comparison');
+}
+</script>
+
+</body>
+</html>
