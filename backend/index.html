@@ -1,476 +1,667 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIDB - Discover 1000+ AI Tools</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>AI Discovery - Discover 1000+ AI Power Tools</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#6366f1',
-                        'secondary': '#8b5cf6',
-                        'accent': '#ec4899',
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'fade-in': 'fadeIn 0.6s ease-out',
-                        'scale-in': 'scaleIn 0.4s ease-out',
-                        'shimmer': 'shimmer 2s linear infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(100px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        },
-                        shimmer: {
-                            '0%': { backgroundPosition: '-1000px 0' },
-                            '100%': { backgroundPosition: '1000px 0' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: #0F1419;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+            color: #ffffff;
+            min-height: 100vh;
         }
-        
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
+
+        /* Glassmorphism Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(15, 22, 41, 0.7);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
         }
-        
-        .glass-strong {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        /* Gradient backgrounds */
-        .gradient-mesh {
-            background: 
-                #0F1419,
-                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
-        }
-        
-        /* Card hover effects */
-        .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .hover-lift:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 60px -10px rgba(99, 102, 241, 0.3);
-        }
-        
-        /* Shimmer effect */
-        .shimmer {
-            background: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-        
-        /* Hide scrollbar */
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* Gradient text */
-        .gradient-text {
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-        
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        
-        /* Star rating */
-        .star-fill {
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .pro-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0.6rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 150px 2rem 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-left h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a8b3ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-left p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .hero-right {
+            position: relative;
+        }
+
+        .dashboard-mockup {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Categories */
+        .categories {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            overflow-x: auto;
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .category-pill {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .category-pill:hover, .category-pill.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Main Content Grid */
+        .main-content {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        /* Trending Section */
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .tool-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(102, 126, 234, 0.2);
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tool-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tool-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
             color: #fbbf24;
         }
-        
-        /* Progress bar animation */
-        .progress-bar {
-            animation: progressFill 1s ease-out forwards;
+
+        .favorite {
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        @keyframes progressFill {
-            from { width: 0; }
+
+        .favorite:hover {
+            transform: scale(1.2);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-number {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            width: 40px;
+        }
+
+        .rank-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .rank-stats {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Submit Card */
+        .submit-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .submit-card h4 {
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-left h1 {
+                font-size: 2.5rem;
+            }
+            .nav-links {
+                display: none;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="gradient-mesh">
+<body>
 
-<!-- Navigation -->
-<nav class="fixed top-0 w-full z-50 glass-strong animate-slide-up">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-            <!-- Logo -->
-            <a href="#" class="flex items-center gap-3 group">
-                <div class="relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition"></div>
-                    <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
-                        <span class="material-icons text-white text-2xl">auto_awesome</span>
-                    </div>
-                </div>
-                <span class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    AIDB
-                </span>
-            </a>
-            
-            <!-- Nav Links -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#" class="text-sm font-semibold text-white hover:text-primary transition-colors">Home</a>
-                <a href="rankings.html" class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Rankings</a>
-                <a href="compare.html" class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Compare</a>
-                <a href="#" class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Categories</a>
-            </div>
-
-            <!-- Search & CTA -->
-            <div class="flex items-center gap-4">
-                <div class="relative hidden lg:block group">
-                    <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition">search</span>
-                    <input type="text" placeholder="Search 1000+ tools..." 
-                           class="glass pl-12 pr-4 py-3 rounded-xl text-sm text-white placeholder-gray-400 focus:ring-2 focus:ring-primary transition w-64 focus:w-80">
-                </div>
-                <button class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all hover:scale-105">
-                    Get Started
-                </button>
-                <button class="p-3 glass rounded-xl hover:bg-white/10 transition">
-                    <span class="material-icons text-white">person</span>
-                </button>
-            </div>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <span class="material-icons">rocket_launch</span>
+            AI Discovery
         </div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#categories">Categories</a>
+            <a href="compare.html">Compare<span class="pro-badge">PRO</span></a>
+            <a href="#pricing">Pricing</a>
+        </div>
+        <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
     </div>
 </nav>
 
 <!-- Hero Section -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-    <!-- Animated Background -->
-    <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
-        <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-float" style="animation-delay: 4s;"></div>
+<section class="hero">
+    <div class="hero-left">
+        <h1>Discover 1000+ AI Power Tools</h1>
+        <p>Maximize your productivity with professional-grade AI tools curated for every business use case.</p>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="scrollToTools()">Explore Tools</button>
+            <button class="btn-secondary">Submit a Tool</button>
+            <button class="btn-primary" onclick="window.location.href='login.html'">Get Started</button>
+        </div>
     </div>
-    
-    <div class="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto animate-fade-in">
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-8 animate-scale-in">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            <span class="text-sm font-medium text-gray-300">Discover the future of AI</span>
-        </div>
-        
-        <!-- Main Heading -->
-        <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
-            <span class="block text-white">Discover</span>
-            <span class="block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                1000+ AI Tools
-            </span>
-        </h1>
-        
-        <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            The most comprehensive AI tools directory. Find, compare, and integrate the perfect AI solution for your needs.
-        </p>
-        
-        <!-- Search Bar -->
-        <div class="max-w-3xl mx-auto mb-8">
-            <div class="glass-strong rounded-2xl p-2 flex items-center gap-3 hover:shadow-2xl hover:shadow-primary/20 transition-all">
-                <span class="material-icons text-gray-400 ml-4 text-3xl">search</span>
-                <input type="text" id="heroSearch" 
-                       placeholder="Search for ChatGPT, Midjourney, Claude..."
-                       class="flex-1 bg-transparent border-none text-white placeholder-gray-400 text-lg py-4 focus:outline-none"
-                       onkeypress="if(event.key==='Enter') performHeroSearch()">
-                <button onclick="performHeroSearch()" 
-                        class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
-                    Search
-                </button>
-            </div>
-        </div>
-        
-        <!-- Stats -->
-        <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div class="glass rounded-xl p-6 hover-lift">
-                <div class="text-3xl font-black text-white mb-1">1000+</div>
-                <div class="text-sm text-gray-400">AI Tools</div>
-            </div>
-            <div class="glass rounded-xl p-6 hover-lift">
-                <div class="text-3xl font-black text-white mb-1">50+</div>
-                <div class="text-sm text-gray-400">Categories</div>
-            </div>
-            <div class="glass rounded-xl p-6 hover-lift">
-                <div class="text-3xl font-black text-white mb-1">Daily</div>
-                <div class="text-sm text-gray-400">Updates</div>
+    <div class="hero-right">
+        <div class="dashboard-mockup">
+            <div style="text-align: center; padding: 2rem;">
+                <span class="material-icons" style="font-size: 5rem; color: #667eea;">dashboard</span>
+                <h3 style="margin-top: 1rem;">Professional Dashboard</h3>
+                <p style="color: rgba(255,255,255,0.6);">Track, compare, and discover AI tools</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Main Content -->
-<main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-20">
-
-<!-- Trending Section -->
-<section class="animate-slide-up">
-    <div class="flex items-center justify-between mb-10">
-        <div>
-            <div class="flex items-center gap-3 mb-2">
-                <span class="material-icons text-accent text-3xl">local_fire_department</span>
-                <h2 class="text-4xl font-black text-white">Trending This Week</h2>
-            </div>
-            <p class="text-gray-400">The hottest AI tools right now</p>
-        </div>
-        <a href="#" class="px-6 py-3 glass rounded-xl hover:bg-white/10 text-primary font-semibold transition-all hover:scale-105">
-            View All →
-        </a>
+<!-- Search Bar -->
+<div class="search-container">
+    <div class="search-bar">
+        <span class="material-icons" style="color: rgba(255,255,255,0.4);">search</span>
+        <input type="text" placeholder="Search 1,000+ professional AI tools..." id="searchInput">
     </div>
-    
-    <div id="trendingContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Loading placeholder -->
-        <div class="col-span-full text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            <p class="text-gray-400 mt-4">Loading trending tools...</p>
-        </div>
-    </div>
-</section>
-
-<!-- Top Rankings & Open Source Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    
-    <!-- Top 10 Section -->
-    <section class="lg:col-span-2">
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h2 class="text-3xl font-black text-white mb-2">🏆 Top 10 AI Tools</h2>
-                <p class="text-gray-400">Based on our growth algorithm</p>
-            </div>
-            <div class="flex gap-2">
-                <button class="px-4 py-2 glass rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition">Month</button>
-                <button class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold">All Time</button>
-            </div>
-        </div>
-        
-        <div id="top10Container" class="space-y-4">
-            <div class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Open Source Sidebar -->
-    <section>
-        <div class="mb-8">
-            <h2 class="text-2xl font-black text-white mb-2">⚡ Open Source</h2>
-            <p class="text-gray-400 text-sm">Popular on GitHub</p>
-        </div>
-        
-        <div id="openSourceContainer" class="space-y-4">
-            <div class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-            </div>
-        </div>
-    </section>
-
 </div>
 
-</main>
+<!-- Categories -->
+<div class="categories" id="categories">
+    <div class="category-pills">
+        <div class="category-pill active" onclick="loadCategory('all')">All Tools</div>
+        <div class="category-pill" onclick="loadCategory('github')">GitHub OS</div>
+        <div class="category-pill" onclick="loadCategory('generative')">Generative AI</div>
+        <div class="category-pill" onclick="loadCategory('llm')">LLMs</div>
+        <div class="category-pill" onclick="loadCategory('image')">Image Gen</div>
+        <div class="category-pill" onclick="loadCategory('code')">Coding</div>
+        <div class="category-pill" onclick="loadCategory('marketing')">Marketing</div>
+        <div class="category-pill" onclick="loadCategory('video')">Video AI</div>
+    </div>
+</div>
 
-<!-- Footer -->
-<footer class="relative z-10 border-t border-white/10 mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div class="col-span-2">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl">
-                        <span class="material-icons text-white">auto_awesome</span>
-                    </div>
-                    <span class="text-xl font-black text-white">AIDB</span>
-                </div>
-                <p class="text-gray-400 text-sm mb-4">Discover, compare, and integrate the best AI tools for your projects.</p>
-            </div>
-            <div>
-                <h5 class="font-bold text-white mb-4">Platform</h5>
-                <nav class="flex flex-col gap-2 text-sm text-gray-400">
-                    <a href="#" class="hover:text-primary transition">Rankings</a>
-                    <a href="#" class="hover:text-primary transition">Categories</a>
-                    <a href="#" class="hover:text-primary transition">API</a>
-                </nav>
-            </div>
-            <div>
-                <h5 class="font-bold text-white mb-4">Newsletter</h5>
-                <div class="flex gap-2">
-                    <input type="email" placeholder="Email" class="flex-1 glass rounded-lg px-3 py-2 text-sm text-white">
-                    <button class="bg-primary p-2 rounded-lg hover:bg-primary/80 transition">
-                        <span class="material-icons text-sm">send</span>
-                    </button>
-                </div>
-            </div>
+<!-- Main Content -->
+<div class="main-content" id="tools">
+    <!-- Trending Tools -->
+    <div>
+        <div class="section-header">
+            <h2>🔥 Trending This Week</h2>
+            <p>Most active and popular tools right now</p>
         </div>
-        <div class="pt-8 border-t border-white/10 text-center text-sm text-gray-500">
-            © 2024 AIDB. Mini Project Demo.
+        <div id="trendingTools" class="tools-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading amazing tools...</p>
+            </div>
         </div>
     </div>
-</footer>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-card">
+            <div class="sidebar-header">
+                <h3>TOP 10 AI TOOLS</h3>
+                <span class="badge">WEEKLY</span>
+            </div>
+            <div id="topRankings">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-card submit-card">
+            <h4>Want to list your tool?</h4>
+            <button class="submit-btn">Submit Now</button>
+        </div>
+    </div>
+</div>
 
 <script>
-const API_URL = 'http://localhost:8000';
-const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+// IMPORTANT: Replace with YOUR Render URL!
+const API_URL = 'https://YOUR-RENDER-URL-HERE.onrender.com';
 
-// Cache
-const cache = { data: null, timestamp: null, ttl: 300000 };
+const emojis = ['🎨', '🤖', '🎬', '🎵', '⚡', '🔥', '✨', '💎', '🚀', '💡'];
 
-async function loadAllData() {
-    if (cache.data && cache.timestamp && (Date.now() - cache.timestamp < cache.ttl)) {
-        displayCachedData();
-        return;
-    }
-    
-    Promise.all([loadTrending(), loadTop10(), loadOpenSource()]);
-}
-
-async function loadTrending() {
+async function loadTrendingTools() {
     try {
-        const response = await fetch(`${API_URL}/api/rankings?query=ai&limit=8`);
+        const response = await fetch(`${API_URL}/api/rankings?query=ai&limit=6`);
         const data = await response.json();
         
         if (data.success && data.data.length > 0) {
-            const container = document.getElementById('trendingContainer');
-            const emojis = ['🎨', '🤖', '🎬', '🎵', '⚡', '🔥', '✨', '💎'];
-            
-            container.innerHTML = data.data.slice(0, 4).map((tool, idx) => `
-                <div class="glass-strong rounded-2xl overflow-hidden hover-lift cursor-pointer group" 
-                     onclick="window.location.href='tool-detail.html?tool=${encodeURIComponent(tool.full_name)}'">
-                    <div class="relative aspect-video bg-gradient-to-br from-primary via-secondary to-accent p-8 flex items-center justify-center overflow-hidden">
-                        <div class="absolute inset-0 bg-black/20"></div>
-                        <span class="relative text-7xl animate-float">${emojis[idx]}</span>
-                        <div class="absolute top-4 right-4 glass px-3 py-1 rounded-full flex items-center gap-1">
-                            <span class="material-icons text-yellow-400 text-sm">star</span>
-                            <span class="text-white font-bold text-sm">${(tool.BoostedScore * 10).toFixed(1)}</span>
+            const container = document.getElementById('trendingTools');
+            container.innerHTML = data.data.map((tool, idx) => `
+                <div class="tool-card" onclick="window.location.href='tool-detail.html?tool=${encodeURIComponent(tool.full_name)}'">
+                    <div class="tool-logo">${emojis[idx % emojis.length]}</div>
+                    <div class="tool-name">${tool.name}</div>
+                    <div class="tool-category">${tool.language || 'AI Tool'}</div>
+                    <div class="tool-description">${(tool.description || 'No description available').substring(0, 100)}...</div>
+                    <div class="tool-footer">
+                        <div class="rating">
+                            <span class="material-icons" style="font-size: 1rem;">star</span>
+                            <span>${(tool.BoostedScore * 10).toFixed(1)}</span>
                         </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-xl text-white mb-2 group-hover:text-primary transition">${tool.name}</h3>
-                        <p class="text-sm text-gray-400 line-clamp-2 mb-4">${(tool.description || '').substring(0, 100)}...</p>
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 glass rounded-full text-xs font-semibold text-gray-300">${tool.language || 'AI'}</span>
-                            <span class="text-primary font-semibold text-sm group-hover:translate-x-1 transition">View →</span>
-                        </div>
+                        <span class="material-icons favorite">favorite_border</span>
                     </div>
                 </div>
             `).join('');
         }
     } catch (error) {
         console.error(error);
-        document.getElementById('trendingContainer').innerHTML = '<div class="col-span-full text-center text-gray-500 py-12">Unable to load trending tools</div>';
+        document.getElementById('trendingTools').innerHTML = '<p style="text-align:center; padding:2rem;">Unable to load tools. Please refresh.</p>';
     }
 }
 
-async function loadTop10() {
+async function loadTopRankings() {
     try {
         const response = await fetch(`${API_URL}/api/rankings?query=machine-learning&limit=10`);
         const data = await response.json();
         
         if (data.success && data.data.length > 0) {
-            const container = document.getElementById('top10Container');
-            
-            container.innerHTML = data.data.map((tool, idx) => {
-                const color = colors[idx % colors.length];
-                const rating = (tool.BoostedScore * 10).toFixed(1);
-                return `
-                    <div class="glass-strong rounded-xl p-5 hover-lift cursor-pointer group" 
-                         onclick="window.location.href='tool-detail.html?tool=${encodeURIComponent(tool.full_name)}'">
-                        <div class="flex items-center gap-4">
-                            <div class="text-4xl font-black" style="background: linear-gradient(135deg, ${color}, ${color}80); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                ${String(idx + 1).padStart(2, '0')}
-                            </div>
-                            <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-lg" style="background: linear-gradient(135deg, ${color}, ${color}80);">
-                                ${tool.name.substring(0, 1)}
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-white text-lg group-hover:text-primary transition">${tool.name}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <div class="flex text-yellow-400">
-                                        ${'★'.repeat(Math.floor(rating / 2))}${'☆'.repeat(5 - Math.floor(rating / 2))}
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-400">${rating}/10</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="px-4 py-2 glass rounded-lg font-semibold text-primary group-hover:bg-primary group-hover:text-white transition">
-                                    View
-                                </div>
-                            </div>
-                        </div>
+            const container = document.getElementById('topRankings');
+            container.innerHTML = data.data.map((tool, idx) => `
+                <div class="ranking-item" onclick="window.location.href='tool-detail.html?tool=${encodeURIComponent(tool.full_name)}'">
+                    <div class="rank-number">${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="rank-logo">${tool.name.substring(0, 1)}</div>
+                    <div class="rank-info">
+                        <div class="rank-name">${tool.name}</div>
+                        <div class="rank-stats">⭐ ${(tool.BoostedScore * 10).toFixed(1)} · ${(tool.stars || 0).toLocaleString()} stars</div>
                     </div>
-                `;
-            }).join('');
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function loadOpenSource() {
-    try {
-        const response = await fetch(`${API_URL}/api/rankings?query=github&limit=6`);
-        const data = await response.json();
-        
-        if (data.success && data.data.length > 0) {
-            const container = document.getElementById('openSourceContainer');
-            
-            container.innerHTML = data.data.slice(0, 3).map(repo => `
-                <div class="glass-strong rounded-xl p-5 hover-lift cursor-pointer">
-                    <h4 class="font-bold text-white mb-2 hover:text-primary transition">${repo.full_name || repo.name}</h4>
-                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">${(repo.description || '').substring(0, 80)}...</p>
-                    <div class="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                        <span class="flex items-center gap-1">
-                            <span class="material-icons" style="font-size:14px">star</span>
-                            ${(repo.stars || 0).toLocaleString()}
-                        </span>
-                        ${repo.language ? `<span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-primary"></div>${repo.language}</span>` : ''}
-                    </div>
-                    <button onclick="window.open('${repo.url}', '_blank')" class="w-full py-2 glass rounded-lg text-sm font-semibold hover:bg-white/10 transition">
-                        View Code
-                    </button>
                 </div>
             `).join('');
         }
@@ -479,23 +670,22 @@ async function loadOpenSource() {
     }
 }
 
-function performHeroSearch() {
-    const query = document.getElementById('heroSearch').value;
-    if (query) window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+function loadCategory(cat) {
+    const pills = document.querySelectorAll('.category-pill');
+    pills.forEach(pill => pill.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Reload data based on category
+    loadTrendingTools();
+}
+
+function scrollToTools() {
+    document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
 }
 
 // Load on page load
-loadAllData();
-
-// Add scroll animations
-window.addEventListener('scroll', () => {
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.8) {
-            el.classList.add('animate-slide-up');
-        }
-    });
-});
+loadTrendingTools();
+loadTopRankings();
 </script>
 
 </body>
