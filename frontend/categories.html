@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - AIDB | Browse AI Tools by Category</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#6366f1',
+                        'secondary': '#8b5cf6',
+                        'accent': '#ec4899',
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'scale-in': 'scaleIn 0.4s ease-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0F1419;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.25);
+        }
+
+        .category-gradient-1 {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .category-gradient-2 {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+
+        .category-gradient-3 {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        }
+
+        .category-gradient-4 {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+        }
+
+        .category-gradient-5 {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+
+        .category-gradient-6 {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+
+        .category-gradient-7 {
+            background: linear-gradient(135deg, #f43f5e, #f59e0b);
+        }
+
+        .category-gradient-8 {
+            background: linear-gradient(135deg, #14b8a6, #22c55e);
+        }
+
+        .category-gradient-9 {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+        }
+
+        .category-gradient-10 {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-strong">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition">
+                        </div>
+                        <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
+                            <span class="material-icons text-white text-2xl">auto_awesome</span>
+                        </div>
+                    </div>
+                    <span
+                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                        AIDB
+                    </span>
+                </a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="index.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Home</a>
+                    <a href="rankings.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Rankings</a>
+                    <a href="compare.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Compare</a>
+                    <a href="categories.html"
+                        class="text-sm font-semibold text-white hover:text-primary transition-colors">Categories</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="search.html" class="p-3 glass rounded-xl hover:bg-white/10 transition">
+                        <span class="material-icons text-white">search</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-28 pb-10 px-4 max-w-7xl mx-auto animate-fade-in">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-black text-white mb-4">
+                Browse by <span
+                    class="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Category</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Explore AI tools organized by what they do. Click any category to see the best tools in that space.
+            </p>
+        </div>
+
+        <!-- Category Grid -->
+        <div id="categoryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-16">
+            <!-- Filled by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Category Results -->
+    <section id="resultsSection" class="hidden max-w-7xl mx-auto px-4 pb-20">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <button onclick="showAllCategories()"
+                    class="text-primary hover:text-white transition font-semibold mb-2 flex items-center gap-1">
+                    <span class="material-icons text-sm">arrow_back</span> All Categories
+                </button>
+                <h2 id="resultsTitle" class="text-3xl font-black text-white"></h2>
+                <p id="resultsSubtitle" class="text-gray-400 mt-1"></p>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Filled by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-white/10 mt-10">
+        <div class="max-w-7xl mx-auto px-4 py-8 text-center text-sm text-gray-500">
+            © 2025 AIDB — IMDB for AI Tools. Built with ❤️
+        </div>
+    </footer>
+
+    <script>
+        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
+        const API_URL = 'https://ai-discovery.onrender.com';
+
+        const CATEGORIES = [
+            { name: "LLMs & Chatbots", icon: "🤖", query: "llm", gradient: "category-gradient-1", desc: "Large language models, GPT, Claude, Llama" },
+            { name: "Image Generation", icon: "🎨", query: "image-generation", gradient: "category-gradient-2", desc: "Stable Diffusion, DALL-E, Midjourney" },
+            { name: "Video AI", icon: "🎬", query: "video-ai", gradient: "category-gradient-3", desc: "Text-to-video, video editing, deepfakes" },
+            { name: "Audio & Music", icon: "🎵", query: "audio-ai", gradient: "category-gradient-4", desc: "Text-to-speech, voice cloning, music AI" },
+            { name: "Code AI", icon: "💻", query: "code-ai", gradient: "category-gradient-5", desc: "Copilot, code generation, AI coding" },
+            { name: "Computer Vision", icon: "👁️", query: "computer-vision", gradient: "category-gradient-6", desc: "Object detection, image classification" },
+            { name: "NLP & Text", icon: "💬", query: "nlp", gradient: "category-gradient-7", desc: "Sentiment analysis, translation, NER" },
+            { name: "Research & ML", icon: "🔬", query: "research", gradient: "category-gradient-8", desc: "Papers, benchmarks, ML frameworks" },
+            { name: "All AI Tools", icon: "⚡", query: "ai", gradient: "category-gradient-9", desc: "Everything AI — full collection" },
+            { name: "Machine Learning", icon: "🧠", query: "machine-learning", gradient: "category-gradient-10", desc: "ML frameworks, deep learning, neural nets" },
+        ];
+
+        // Render category grid
+        function renderCategoryGrid() {
+            const grid = document.getElementById('categoryGrid');
+            grid.innerHTML = CATEGORIES.map((cat, i) => `
+        <div class="glass-strong rounded-2xl p-6 hover-lift cursor-pointer group animate-scale-in"
+             style="animation-delay: ${i * 0.05}s"
+             onclick="loadCategory('${cat.query}', '${cat.name}', '${cat.icon}')">
+            <div class="${cat.gradient} w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-4
+                        group-hover:scale-110 transition-transform shadow-lg">
+                ${cat.icon}
+            </div>
+            <h3 class="text-white font-bold text-lg mb-1 group-hover:text-primary transition">${cat.name}</h3>
+            <p class="text-gray-500 text-sm leading-snug">${cat.desc}</p>
+        </div>
+    `).join('');
+        }
+
+        // Load a category's tools
+        async function loadCategory(query, name, icon) {
+            // Hide grid, show results
+            document.getElementById('categoryGrid').parentElement.querySelector('.mb-12').style.display = 'none';
+            document.getElementById('categoryGrid').style.display = 'none';
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+
+            document.getElementById('resultsTitle').textContent = `${icon} ${name}`;
+            document.getElementById('resultsSubtitle').textContent = 'Loading tools...';
+
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+        <div class="col-span-full text-center py-16">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <p class="text-gray-400 mt-4">Loading ${name} tools...</p>
+        </div>
+    `;
+
+            try {
+                const response = await fetch(`${API_URL}/api/rankings?query=${encodeURIComponent(query)}&limit=30`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    document.getElementById('resultsSubtitle').textContent = `${data.data.length} tools found`;
+
+                    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+
+                    container.innerHTML = data.data.map((tool, idx) => {
+                        const color = colors[idx % colors.length];
+                        const score = (tool.BoostedScore * 10).toFixed(1);
+                        return `
+                <div class="glass-strong rounded-2xl overflow-hidden hover-lift cursor-pointer group animate-slide-up"
+                     style="animation-delay: ${idx * 0.03}s"
+                     onclick="window.open('${tool.url}', '_blank')">
+                    
+                    <!-- Score badge -->
+                    <div class="relative p-5 pb-3">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-lg"
+                                     style="background: linear-gradient(135deg, ${color}, ${color}88);">
+                                    ${tool.name.substring(0, 1).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg group-hover:text-primary transition">${tool.name}</h3>
+                                    <p class="text-gray-500 text-xs">${tool.full_name}</p>
+                                </div>
+                            </div>
+                            <div class="glass px-3 py-1 rounded-full flex items-center gap-1">
+                                <span class="material-icons text-yellow-400 text-sm">star</span>
+                                <span class="text-white font-bold text-sm">${score}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="px-5 pb-3">
+                        <p class="text-gray-400 text-sm line-clamp-2 leading-relaxed">
+                            ${(tool.description || 'No description').substring(0, 120)}${(tool.description || '').length > 120 ? '...' : ''}
+                        </p>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="px-5 pb-3 flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1">
+                            <span class="material-icons" style="font-size:14px">star</span>
+                            ${(tool.stars || 0).toLocaleString()}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <span class="material-icons" style="font-size:14px">call_split</span>
+                            ${(tool.forks || 0).toLocaleString()}
+                        </span>
+                        ${tool.language ? `<span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full" style="background:${color}"></div>${tool.language}</span>` : ''}
+                        ${tool.IsBoosted ? '<span class="text-yellow-400 font-semibold">🚀 Rising</span>' : ''}
+                    </div>
+
+                    <!-- Topics -->
+                    ${tool.topics && tool.topics.length > 0 ? `
+                    <div class="px-5 pb-3 flex flex-wrap gap-1.5">
+                        ${tool.topics.slice(0, 4).map(t => `<span class="px-2 py-0.5 rounded text-xs bg-white/5 text-gray-400">${t}</span>`).join('')}
+                    </div>` : ''}
+
+                    <!-- Actions -->
+                    <div class="px-5 pb-5 flex gap-3">
+                        <button onclick="event.stopPropagation(); window.open('${tool.url}', '_blank')"
+                                class="flex-1 py-2.5 glass rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/10 transition flex items-center justify-center gap-2">
+                            <span class="material-icons text-sm">code</span> View Code
+                        </button>
+                        <button onclick="event.stopPropagation(); window.location.href='tool.html?tool=${encodeURIComponent(tool.full_name)}'"
+                                class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white transition flex items-center justify-center gap-2"
+                                style="background: linear-gradient(135deg, ${color}, ${color}88);">
+                            <span class="material-icons text-sm">open_in_new</span> Details
+                        </button>
+                    </div>
+                </div>
+                `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                <div class="col-span-full text-center py-16">
+                    <span class="text-6xl block mb-4">🔍</span>
+                    <p class="text-gray-400 text-lg">No tools found in this category yet.</p>
+                    <p class="text-gray-500 text-sm mt-2">Try a different category or check back later.</p>
+                </div>
+            `;
+                    document.getElementById('resultsSubtitle').textContent = 'No tools found';
+                }
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `
+            <div class="col-span-full text-center py-16">
+                <span class="text-6xl block mb-4">⚠️</span>
+                <p class="text-gray-400 text-lg">Unable to load tools. Backend may be waking up.</p>
+                <button onclick="loadCategory('${query}', '${name}', '${icon}')" 
+                        class="mt-4 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/80 transition">
+                    Try Again
+                </button>
+            </div>
+        `;
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showAllCategories() {
+            document.getElementById('categoryGrid').parentElement.querySelector('.mb-12').style.display = '';
+            document.getElementById('categoryGrid').style.display = '';
+            document.getElementById('resultsSection').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Check URL params for direct category link
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const cat = params.get('cat');
+            if (cat) {
+                const found = CATEGORIES.find(c => c.query === cat);
+                if (found) {
+                    loadCategory(found.query, found.name, found.icon);
+                }
+            }
+        }
+
+        // Initialize
+        renderCategoryGrid();
+        checkUrlParams();
+    </script>
+
+</body>
+
+</html>
