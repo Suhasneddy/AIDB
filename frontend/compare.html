@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compare AI Tools - AIDB</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -22,99 +24,111 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         .comparison-grid {
             display: grid;
             grid-template-columns: 200px repeat(auto-fit, minmax(250px, 1fr));
             gap: 1px;
             background: #1f2937;
         }
+
         .comparison-cell {
             background: #0f172a;
             padding: 1.5rem 1rem;
         }
+
         .comparison-header {
             background: #1a1f2e;
         }
     </style>
 </head>
+
 <body class="bg-bg-dark text-white min-h-screen">
 
-<!-- Header -->
-<header class="sticky top-0 z-50 backdrop-blur-md bg-bg-dark/80 border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex items-center gap-4">
-                <button onclick="history.back()" class="text-2xl hover:text-secondary">←</button>
-                <h1 class="text-xl font-bold">Compare AI</h1>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-bg-dark/80 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <button onclick="history.back()" class="text-2xl hover:text-secondary">←</button>
+                    <h1 class="text-xl font-bold">Compare AI</h1>
+                </div>
+                <button onclick="addToolToCompare()"
+                    class="bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    <span class="material-icons text-sm">add</span>
+                    Add Tool
+                </button>
             </div>
-            <button onclick="addToolToCompare()" class="bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                <span class="material-icons text-sm">add</span>
-                Add Tool
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- Tool Selector -->
+        <div id="toolSelector" class="hidden mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700">
+            <h3 class="text-lg font-bold mb-4">Select Tools to Compare</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="toolList">
+                <!-- Will be populated dynamically -->
+            </div>
+            <div class="mt-4 flex justify-end gap-3">
+                <button onclick="closeSelector()"
+                    class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700">Cancel</button>
+                <button onclick="compareSelected()"
+                    class="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold">Compare</button>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div id="comparisonContainer" class="overflow-x-auto">
+            <div class="text-center text-gray-500 py-20">
+                <span class="material-icons text-6xl mb-4">compare_arrows</span>
+                <p class="text-xl font-semibold mb-2">No tools selected</p>
+                <p class="text-sm">Click "Add Tool" to start comparing AI tools</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="actionButtons" class="hidden mt-8 flex justify-end gap-4">
+            <button onclick="shareComparison()"
+                class="px-6 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 font-semibold flex items-center gap-2">
+                <span class="material-icons text-sm">share</span>
+                Share Comparison
+            </button>
+            <button onclick="exportPDF()"
+                class="px-6 py-3 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold flex items-center gap-2">
+                <span class="material-icons text-sm">download</span>
+                Export Report (PDF)
             </button>
         </div>
-    </div>
-</header>
 
-<main class="max-w-7xl mx-auto px-4 py-8">
-    
-    <!-- Tool Selector -->
-    <div id="toolSelector" class="hidden mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700">
-        <h3 class="text-lg font-bold mb-4">Select Tools to Compare</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="toolList">
-            <!-- Will be populated dynamically -->
-        </div>
-        <div class="mt-4 flex justify-end gap-3">
-            <button onclick="closeSelector()" class="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-700">Cancel</button>
-            <button onclick="compareSelected()" class="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold">Compare</button>
-        </div>
-    </div>
+    </main>
 
-    <!-- Comparison Table -->
-    <div id="comparisonContainer" class="overflow-x-auto">
-        <div class="text-center text-gray-500 py-20">
-            <span class="material-icons text-6xl mb-4">compare_arrows</span>
-            <p class="text-xl font-semibold mb-2">No tools selected</p>
-            <p class="text-sm">Click "Add Tool" to start comparing AI tools</p>
-        </div>
-    </div>
+    <script>
+        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
+        const API_URL = 'http://localhost:8000';
+        let selectedTools = [];
+        let comparisonTools = [];
 
-    <!-- Action Buttons -->
-    <div id="actionButtons" class="hidden mt-8 flex justify-end gap-4">
-        <button onclick="shareComparison()" class="px-6 py-3 rounded-lg border border-gray-700 hover:bg-gray-800 font-semibold flex items-center gap-2">
-            <span class="material-icons text-sm">share</span>
-            Share Comparison
-        </button>
-        <button onclick="exportPDF()" class="px-6 py-3 rounded-lg bg-secondary hover:bg-secondary/90 font-semibold flex items-center gap-2">
-            <span class="material-icons text-sm">download</span>
-            Export Report (PDF)
-        </button>
-    </div>
+        async function addToolToCompare() {
+            document.getElementById('toolSelector').classList.remove('hidden');
+            await loadAvailableTools();
+        }
 
-</main>
+        function closeSelector() {
+            document.getElementById('toolSelector').classList.add('hidden');
+        }
 
-<script>
-const API_URL = 'http://localhost:8000';
-let selectedTools = [];
-let comparisonTools = [];
+        async function loadAvailableTools() {
+            try {
+                const response = await fetch(`${API_URL}/api/rankings?query=machine-learning&limit=20`);
+                const data = await response.json();
 
-async function addToolToCompare() {
-    document.getElementById('toolSelector').classList.remove('hidden');
-    await loadAvailableTools();
-}
-
-function closeSelector() {
-    document.getElementById('toolSelector').classList.add('hidden');
-}
-
-async function loadAvailableTools() {
-    try {
-        const response = await fetch(`${API_URL}/api/rankings?query=machine-learning&limit=20`);
-        const data = await response.json();
-        
-        if (data.success && data.data.length > 0) {
-            const toolList = document.getElementById('toolList');
-            toolList.innerHTML = data.data.map((tool, idx) => `
+                if (data.success && data.data.length > 0) {
+                    const toolList = document.getElementById('toolList');
+                    toolList.innerHTML = data.data.map((tool, idx) => `
                 <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-700 hover:border-secondary cursor-pointer transition">
                     <input type="checkbox" value="${idx}" onchange="toggleTool(${idx}, this.checked)" 
                            class="w-4 h-4 text-secondary bg-gray-700 border-gray-600 rounded focus:ring-secondary">
@@ -124,49 +138,49 @@ async function loadAvailableTools() {
                     </div>
                 </label>
             `).join('');
-            
-            // Store tools for later reference
-            window.availableTools = data.data;
+
+                    // Store tools for later reference
+                    window.availableTools = data.data;
+                }
+            } catch (error) {
+                console.error('Error loading tools:', error);
+            }
         }
-    } catch (error) {
-        console.error('Error loading tools:', error);
-    }
-}
 
-function toggleTool(idx, checked) {
-    if (checked && !selectedTools.includes(idx)) {
-        selectedTools.push(idx);
-    } else {
-        selectedTools = selectedTools.filter(i => i !== idx);
-    }
-}
+        function toggleTool(idx, checked) {
+            if (checked && !selectedTools.includes(idx)) {
+                selectedTools.push(idx);
+            } else {
+                selectedTools = selectedTools.filter(i => i !== idx);
+            }
+        }
 
-function compareSelected() {
-    if (selectedTools.length === 0) {
-        alert('Please select at least 1 tool to compare');
-        return;
-    }
-    
-    if (selectedTools.length > 4) {
-        alert('Maximum 4 tools can be compared at once');
-        return;
-    }
-    
-    comparisonTools = selectedTools.map(idx => window.availableTools[idx]);
-    renderComparison();
-    closeSelector();
-    selectedTools = [];
-}
+        function compareSelected() {
+            if (selectedTools.length === 0) {
+                alert('Please select at least 1 tool to compare');
+                return;
+            }
 
-function renderComparison() {
-    if (comparisonTools.length === 0) return;
-    
-    const container = document.getElementById('comparisonContainer');
-    document.getElementById('actionButtons').classList.remove('hidden');
-    
-    const colors = ['#06B6D4', '#8B5CF6', '#F59E0B'];
-    
-    container.innerHTML = `
+            if (selectedTools.length > 4) {
+                alert('Maximum 4 tools can be compared at once');
+                return;
+            }
+
+            comparisonTools = selectedTools.map(idx => window.availableTools[idx]);
+            renderComparison();
+            closeSelector();
+            selectedTools = [];
+        }
+
+        function renderComparison() {
+            if (comparisonTools.length === 0) return;
+
+            const container = document.getElementById('comparisonContainer');
+            document.getElementById('actionButtons').classList.remove('hidden');
+
+            const colors = ['#06B6D4', '#8B5CF6', '#F59E0B'];
+
+            container.innerHTML = `
         <div class="comparison-grid min-w-max">
             
             <!-- Header Row -->
@@ -316,41 +330,42 @@ function renderComparison() {
             
         </div>
     `;
-}
+        }
 
-function removeTool(idx) {
-    comparisonTools.splice(idx, 1);
-    if (comparisonTools.length === 0) {
-        document.getElementById('comparisonContainer').innerHTML = `
+        function removeTool(idx) {
+            comparisonTools.splice(idx, 1);
+            if (comparisonTools.length === 0) {
+                document.getElementById('comparisonContainer').innerHTML = `
             <div class="text-center text-gray-500 py-20">
                 <span class="material-icons text-6xl mb-4">compare_arrows</span>
                 <p class="text-xl font-semibold mb-2">No tools selected</p>
                 <p class="text-sm">Click "Add Tool" to start comparing AI tools</p>
             </div>
         `;
-        document.getElementById('actionButtons').classList.add('hidden');
-    } else {
-        renderComparison();
-    }
-}
+                document.getElementById('actionButtons').classList.add('hidden');
+            } else {
+                renderComparison();
+            }
+        }
 
-function shareComparison() {
-    const toolNames = comparisonTools.map(t => t.name).join(' vs ');
-    if (navigator.share) {
-        navigator.share({
-            title: `AI Tool Comparison: ${toolNames}`,
-            text: `Check out this comparison of ${toolNames}`,
-            url: window.location.href
-        });
-    } else {
-        alert(`Share this URL:\n${window.location.href}`);
-    }
-}
+        function shareComparison() {
+            const toolNames = comparisonTools.map(t => t.name).join(' vs ');
+            if (navigator.share) {
+                navigator.share({
+                    title: `AI Tool Comparison: ${toolNames}`,
+                    text: `Check out this comparison of ${toolNames}`,
+                    url: window.location.href
+                });
+            } else {
+                alert(`Share this URL:\n${window.location.href}`);
+            }
+        }
 
-function exportPDF() {
-    alert('PDF export feature - In a real app, this would generate a PDF report of the comparison');
-}
-</script>
+        function exportPDF() {
+            alert('PDF export feature - In a real app, this would generate a PDF report of the comparison');
+        }
+    </script>
 
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -200,15 +201,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="search-box">
             <div class="back-btn" onclick="window.location.href='home.html'">←</div>
-            <input type="text" 
-                   class="search-input" 
-                   id="searchInput"
-                   placeholder="Search AI tools, repos, or topics..."
-                   onkeypress="handleKeyPress(event)">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search AI tools, repos, or topics..."
+                onkeypress="handleKeyPress(event)">
             <button class="search-btn" onclick="performSearch()">Search</button>
         </div>
     </div>
@@ -250,6 +249,7 @@
     </div>
 
     <script>
+        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
         const API_URL = 'http://localhost:8000';
 
         function handleKeyPress(event) {
@@ -328,4 +328,5 @@
         document.getElementById('searchInput').focus();
     </script>
 </body>
+
 </html>

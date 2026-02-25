@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -214,6 +215,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="back-btn" onclick="window.location.href='home.html'">←</div>
@@ -250,6 +252,7 @@
     </div>
 
     <script>
+        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
         const API_URL = 'http://localhost:8000';
 
         async function loadRepos(query = 'machine-learning') {
@@ -311,7 +314,7 @@
 
         // Update active filter button
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -321,4 +324,5 @@
         loadRepos();
     </script>
 </body>
+
 </html>

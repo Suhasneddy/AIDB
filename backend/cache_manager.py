@@ -2,59 +2,74 @@ import json
 import time
 from pathlib import Path
 
+
 class DataCache:
-    """Simple file-based cache to avoid repeated API calls"""
-    
+    """
+    Dual cache: in-memory (primary, instant) + file-based (backup, survives restarts).
+    On Render.com, file cache is ephemeral but in-memory works great.
+    """
+
     def __init__(self, cache_dir="cache"):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
         self.cache_duration = 3600  # 1 hour in seconds
-    
+
+        # In-memory cache (FAST! No disk I/O)
+        self._memory = {}
+
     def get(self, key):
-        """Get cached data if it exists and is fresh"""
-        cache_file = self.cache_dir / f"{key}.json"
-        
-        if not cache_file.exists():
-            return None
-        
-        try:
-            with open(cache_file, 'r', encoding='utf-8') as f:
-                cached = json.load(f)
-            
-            # Check if cache is still fresh
-            if time.time() - cached['timestamp'] < self.cache_duration:
-                print(f"✅ Using cached data for {key}")
-                return cached['data']
+        """Get cached data - checks memory first, then file"""
+        # 1. Check in-memory cache (instant)
+        if key in self._memory:
+            entry = self._memory[key]
+            if time.time() - entry["timestamp"] < self.cache_duration:
+                return entry["data"]
             else:
-                print(f"⏰ Cache expired for {key}")
-                return None
-                
-        except Exception as e:
-            print(f"⚠️ Cache read error: {e}")
-            return None
-    
-    def set(self, key, data):
-        """Store data in cache"""
+                del self._memory[key]
+
+        # 2. Check file cache (backup)
         cache_file = self.cache_dir / f"{key}.json"
-        
+        if cache_file.exists():
+            try:
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cached = json.load(f)
+                if time.time() - cached["timestamp"] < self.cache_duration:
+                    # Promote to memory cache
+                    self._memory[key] = cached
+                    return cached["data"]
+            except Exception:
+                pass
+
+        return None
+
+    def set(self, key, data):
+        """Store data in both memory and file cache"""
+        entry = {"timestamp": time.time(), "data": data}
+
+        # 1. Always set in memory (instant)
+        self._memory[key] = entry
+
+        # 2. Try to write to file (backup)
         try:
-            cached = {
-                'timestamp': time.time(),
-                'data': data
-            }
-            
-            with open(cache_file, 'w', encoding='utf-8') as f:
-                json.dump(cached, f, ensure_ascii=False, indent=2)
-            
-            print(f"💾 Cached data for {key}")
-            
-        except Exception as e:
-            print(f"⚠️ Cache write error: {e}")
-    
+            cache_file = self.cache_dir / f"{key}.json"
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(entry, f, ensure_ascii=False, default=str)
+        except Exception:
+            pass  # File write failure is OK, memory cache still works
+
+    def get_all_keys(self):
+        """Get all valid cached keys"""
+        return [k for k, v in self._memory.items()
+                if time.time() - v["timestamp"] < self.cache_duration]
+
     def clear(self):
         """Clear all cache"""
+        self._memory.clear()
         for cache_file in self.cache_dir.glob("*.json"):
-            cache_file.unlink()
+            try:
+                cache_file.unlink()
+            except Exception:
+                pass
         print("🗑️ Cache cleared")
 
 
