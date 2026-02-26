@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover AI Tools - AIDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0F1419; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .filter-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .repo-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(99,102,241,0.3); }
+        .boost-badge { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                AIDB
+            </a>
+            <div class="flex gap-4">
+                <a href="index.html" class="px-4 py-2 glass rounded-lg hover:bg-white/10">Home</a>
+                <a href="discover.html" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">Discover</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Title & Stats -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-black mb-4">Discover AI Tools</h1>
+            <p class="text-gray-400 text-lg">Find the perfect AI tool for your needs</p>
+            <div class="flex justify-center gap-6 mt-6">
+                <div class="glass px-6 py-3 rounded-xl">
+                    <div class="text-2xl font-bold" id="totalCount">0</div>
+                    <div class="text-sm text-gray-400">Total Tools</div>
+                </div>
+                <div class="glass px-6 py-3 rounded-xl">
+                    <div class="text-2xl font-bold text-yellow-500" id="boostedCount">0</div>
+                    <div class="text-sm text-gray-400">Hidden Gems</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="glass rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Filters</h2>
+                <button onclick="resetFilters()" class="text-sm text-blue-400 hover:text-blue-300">Reset All</button>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-3">Category</label>
+                <div class="flex flex-wrap gap-2" id="categoryFilters">
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-category="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="llm">🤖 LLMs</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="image-generation">🎨 Image Gen</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="video-ai">🎬 Video AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="audio-ai">🎵 Audio AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="code-ai">💻 Code AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="computer-vision">👁️ Vision</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="nlp">💬 NLP</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="machine-learning">🧠 ML</button>
+                </div>
+            </div>
+
+            <!-- Results Limit -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-3">Show Results</label>
+                <div class="flex gap-2">
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-limit="20">Top 20</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-limit="30">Top 30</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-limit="50">Top 50</button>
+                </div>
+            </div>
+
+            <!-- Sort By -->
+            <div>
+                <label class="block text-sm font-semibold mb-3">Sort By</label>
+                <div class="flex gap-2">
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-sort="score">🏆 Score</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="stars">⭐ Stars</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="growth">📈 Growth</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="fresh">🔥 Freshness</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="mt-4 text-gray-400">Loading AI tools...</p>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Results (<span id="resultCount">0</span>)</h2>
+                <div class="text-sm text-gray-400">Sorted by <span id="currentSort">Score</span></div>
+            </div>
+            <div id="repoGrid" class="grid grid-cols-1 gap-4"></div>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-2xl font-bold mb-2">No tools found</h3>
+            <p class="text-gray-400">Try adjusting your filters</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let allTools = [];
+        let currentCategory = 'all';
+        let currentLimit = 20;
+        let currentSort = 'score';
+
+        // Initialize
+        async function init() {
+            setupFilterListeners();
+            await loadTools();
+        }
+
+        // Setup filter listeners
+        function setupFilterListeners() {
+            // Category filters
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    filterAndDisplay();
+                });
+            });
+
+            // Limit filters
+            document.querySelectorAll('[data-limit]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-limit]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentLimit = parseInt(btn.dataset.limit);
+                    filterAndDisplay();
+                });
+            });
+
+            // Sort filters
+            document.querySelectorAll('[data-sort]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSort = btn.dataset.sort;
+                    document.getElementById('currentSort').textContent = btn.textContent.trim();
+                    filterAndDisplay();
+                });
+            });
+        }
+
+        // Load tools from API
+        async function loadTools() {
+            try {
+                const response = await fetch(`${API_URL}/api/rankings?query=ai&limit=100`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allTools = data.data;
+                    document.getElementById('totalCount').textContent = allTools.length;
+                    document.getElementById('boostedCount').textContent = allTools.filter(t => t.IsBoosted).length;
+                    filterAndDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading tools:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-red-400">
+                        <div class="text-4xl mb-4">⚠️</div>
+                        <p>Failed to load tools. Make sure backend is running at ${API_URL}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Filter and display tools
+        function filterAndDisplay() {
+            let filtered = [...allTools];
+
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(tool => matchesCategory(tool, currentCategory));
+            }
+
+            // Sort
+            filtered = sortTools(filtered, currentSort);
+
+            // Limit
+            filtered = filtered.slice(0, currentLimit);
+
+            // Display
+            displayTools(filtered);
+        }
+
+        // Check if tool matches category
+        function matchesCategory(tool, category) {
+            const topics = (tool.topics || []).map(t => t.toLowerCase()).join(' ');
+            const name = (tool.name || '').toLowerCase();
+            const desc = (tool.description || '').toLowerCase();
+            const searchText = `${topics} ${name} ${desc}`;
+
+            const categoryMap = {
+                'llm': ['llm', 'gpt', 'language-model', 'chatgpt', 'transformer'],
+                'image-generation': ['stable-diffusion', 'image-generation', 'dall-e', 'diffusion', 'midjourney'],
+                'video-ai': ['video-generation', 'text-to-video', 'video'],
+                'audio-ai': ['text-to-speech', 'tts', 'music', 'voice', 'audio'],
+                'code-ai': ['code-generation', 'copilot', 'coding', 'code-assistant'],
+                'computer-vision': ['computer-vision', 'object-detection', 'image-classification', 'yolo'],
+                'nlp': ['nlp', 'text', 'sentiment', 'language', 'natural-language'],
+                'machine-learning': ['machine-learning', 'deep-learning', 'ml', 'neural-network']
+            };
+
+            const keywords = categoryMap[category] || [category];
+            return keywords.some(kw => searchText.includes(kw));
+        }
+
+        // Sort tools
+        function sortTools(tools, sortBy) {
+            switch(sortBy) {
+                case 'stars':
+                    return tools.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+                case 'growth':
+                    return tools.sort((a, b) => (b.GrowthRate_N || 0) - (a.GrowthRate_N || 0));
+                case 'fresh':
+                    return tools.sort((a, b) => (b.Freshness_N || 0) - (a.Freshness_N || 0));
+                default: // score
+                    return tools.sort((a, b) => (b.BoostedScore || 0) - (a.BoostedScore || 0));
+            }
+        }
+
+        // Display tools
+        function displayTools(tools) {
+            const grid = document.getElementById('repoGrid');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const noResults = document.getElementById('noResults');
+
+            loading.classList.add('hidden');
+            
+            if (tools.length === 0) {
+                results.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            results.classList.remove('hidden');
+            document.getElementById('resultCount').textContent = tools.length;
+
+            grid.innerHTML = tools.map((tool, idx) => `
+                <div class="repo-card glass rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="window.open('${tool.url}', '_blank')">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-2xl font-black text-gray-600">#${idx + 1}</span>
+                                <h3 class="text-xl font-bold text-blue-400 hover:text-blue-300">${tool.name}</h3>
+                                ${tool.IsBoosted ? `<span class="boost-badge text-xs px-2 py-1 rounded-full text-white font-semibold">🚀 ${tool.BoostTier}</span>` : ''}
+                            </div>
+                            <p class="text-sm text-gray-400 mb-3">${tool.full_name || ''}</p>
+                            <p class="text-gray-300 text-sm line-clamp-2">${tool.description || 'No description'}</p>
+                        </div>
+                        <div class="text-right ml-4">
+                            <div class="text-2xl font-bold text-yellow-500">${(tool.BoostedScore * 10).toFixed(1)}</div>
+                            <div class="text-xs text-gray-500">Score</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 text-sm text-gray-400 mb-4">
+                        <span>⭐ ${(tool.stars || 0).toLocaleString()}</span>
+                        <span>🔱 ${(tool.forks || 0).toLocaleString()}</span>
+                        ${tool.language ? `<span>● ${tool.language}</span>` : ''}
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex gap-2 flex-wrap">
+                            ${(tool.topics || []).slice(0, 3).map(tag => 
+                                `<span class="text-xs px-2 py-1 rounded-md bg-white/5 text-gray-400">${tag}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            Growth: ${((tool.GrowthRate_N || 0) * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Reset filters
+        function resetFilters() {
+            currentCategory = 'all';
+            currentLimit = 20;
+            currentSort = 'score';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-category="all"]').classList.add('active');
+            document.querySelector('[data-limit="20"]').classList.add('active');
+            document.querySelector('[data-sort="score"]').classList.add('active');
+            document.getElementById('currentSort').textContent = '🏆 Score';
+            
+            filterAndDisplay();
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
