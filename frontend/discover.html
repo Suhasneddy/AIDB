@@ -118,9 +118,14 @@
         let currentCategory = 'all';
         let currentLimit = 20;
         let currentSort = 'score';
+        let searchQuery = '';
 
         // Initialize
         async function init() {
+            // Get search query from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            searchQuery = urlParams.get('q') || '';
+            
             setupFilterListeners();
             await loadTools();
         }
@@ -186,6 +191,14 @@
         function filterAndDisplay() {
             let filtered = [...allTools];
 
+            // Filter by search query
+            if (searchQuery) {
+                filtered = filtered.filter(tool => {
+                    const searchText = `${tool.name} ${tool.description} ${tool.full_name} ${(tool.topics || []).join(' ')}`.toLowerCase();
+                    return searchText.includes(searchQuery.toLowerCase());
+                });
+            }
+
             // Filter by category
             if (currentCategory !== 'all') {
                 filtered = filtered.filter(tool => matchesCategory(tool, currentCategory));
@@ -206,17 +219,18 @@
             const topics = (tool.topics || []).map(t => t.toLowerCase()).join(' ');
             const name = (tool.name || '').toLowerCase();
             const desc = (tool.description || '').toLowerCase();
-            const searchText = `${topics} ${name} ${desc}`;
+            const lang = (tool.language || '').toLowerCase();
+            const searchText = `${topics} ${name} ${desc} ${lang}`;
 
             const categoryMap = {
-                'llm': ['llm', 'gpt', 'language-model', 'chatgpt', 'transformer'],
-                'image-generation': ['stable-diffusion', 'image-generation', 'dall-e', 'diffusion', 'midjourney'],
-                'video-ai': ['video-generation', 'text-to-video', 'video'],
-                'audio-ai': ['text-to-speech', 'tts', 'music', 'voice', 'audio'],
-                'code-ai': ['code-generation', 'copilot', 'coding', 'code-assistant'],
-                'computer-vision': ['computer-vision', 'object-detection', 'image-classification', 'yolo'],
-                'nlp': ['nlp', 'text', 'sentiment', 'language', 'natural-language'],
-                'machine-learning': ['machine-learning', 'deep-learning', 'ml', 'neural-network']
+                'llm': ['llm', 'gpt', 'language-model', 'chatgpt', 'transformer', 'bert', 'openai', 'claude', 'gemini'],
+                'image-generation': ['stable-diffusion', 'image-generation', 'dall-e', 'diffusion', 'midjourney', 'image', 'gan', 'generative', 'art', 'picture'],
+                'video-ai': ['video-generation', 'text-to-video', 'video', 'animation', 'movie', 'film'],
+                'audio-ai': ['text-to-speech', 'tts', 'music', 'voice', 'audio', 'sound', 'speech'],
+                'code-ai': ['code-generation', 'copilot', 'coding', 'code-assistant', 'programming', 'developer'],
+                'computer-vision': ['computer-vision', 'object-detection', 'image-classification', 'yolo', 'vision', 'detection', 'recognition'],
+                'nlp': ['nlp', 'text', 'sentiment', 'language', 'natural-language', 'processing'],
+                'machine-learning': ['machine-learning', 'deep-learning', 'ml', 'neural-network', 'ai', 'artificial-intelligence', 'model', 'training']
             };
 
             const keywords = categoryMap[category] || [category];
@@ -231,7 +245,12 @@
                 case 'growth':
                     return tools.sort((a, b) => (b.GrowthRate_N || 0) - (a.GrowthRate_N || 0));
                 case 'fresh':
-                    return tools.sort((a, b) => (b.Freshness_N || 0) - (a.Freshness_N || 0));
+                    // Use Activity_N as fallback if Freshness_N is 0 (same as display)
+                    return tools.sort((a, b) => {
+                        const aFresh = a.Freshness_N || a.Activity_N || 0;
+                        const bFresh = b.Freshness_N || b.Activity_N || 0;
+                        return bFresh - aFresh;
+                    });
                 default: // score
                     return tools.sort((a, b) => (b.BoostedScore || 0) - (a.BoostedScore || 0));
             }
@@ -256,7 +275,30 @@
             results.classList.remove('hidden');
             document.getElementById('resultCount').textContent = tools.length;
 
-            grid.innerHTML = tools.map((tool, idx) => `
+            grid.innerHTML = tools.map((tool, idx) => {
+                // Calculate score based on current sort
+                let displayScore, scoreLabel;
+                switch(currentSort) {
+                    case 'stars':
+                        displayScore = Math.min((tool.stars || 0) / 10000, 10); // Normalize to 0-10 scale
+                        scoreLabel = 'Stars';
+                        break;
+                    case 'growth':
+                        displayScore = (tool.GrowthRate_N || 0) * 10; // 0-1 to 0-10
+                        scoreLabel = 'Growth';
+                        break;
+                    case 'fresh':
+                        // Use Activity_N as fallback if Freshness_N is 0
+                        const freshnessValue = tool.Freshness_N || tool.Activity_N || 0;
+                        displayScore = freshnessValue * 10; // 0-1 to 0-10
+                        scoreLabel = 'Freshness';
+                        break;
+                    default: // score
+                        displayScore = (tool.BoostedScore || 0) * 10;
+                        scoreLabel = 'Score';
+                }
+                
+                return `
                 <div class="repo-card glass rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="window.open('${tool.url}', '_blank')">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
@@ -269,8 +311,8 @@
                             <p class="text-gray-300 text-sm line-clamp-2">${tool.description || 'No description'}</p>
                         </div>
                         <div class="text-right ml-4">
-                            <div class="text-2xl font-bold text-yellow-500">${(tool.BoostedScore * 10).toFixed(1)}</div>
-                            <div class="text-xs text-gray-500">Score</div>
+                            <div class="text-2xl font-bold text-yellow-500">${displayScore.toFixed(1)}</div>
+                            <div class="text-xs text-gray-500">${scoreLabel}</div>
                         </div>
                     </div>
 
@@ -291,7 +333,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // Reset filters

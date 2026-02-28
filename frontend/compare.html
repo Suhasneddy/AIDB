@@ -28,20 +28,51 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: 200px repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1px;
-            background: #1f2937;
+        .comparison-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        .comparison-cell {
-            background: #0f172a;
+        .comparison-table th {
+            background: #1e293b;
             padding: 1.5rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid #374151;
+            font-weight: 600;
         }
 
-        .comparison-header {
-            background: #1a1f2e;
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #1f2937;
+            background: #0f172a;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .row-label {
+            background: #1a1f2e !important;
+            font-weight: 600;
+            color: #9ca3af;
+            width: 180px;
+        }
+
+        .section-header {
+            background: #1e293b !important;
+            font-weight: 700;
+            color: #60a5fa;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .category-btn.active {
+            background: #3E92CC !important;
         }
     </style>
 </head>
@@ -70,6 +101,20 @@
         <!-- Tool Selector -->
         <div id="toolSelector" class="hidden mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700">
             <h3 class="text-lg font-bold mb-4">Select Tools to Compare</h3>
+            
+            <!-- Category Filter -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-3 text-gray-400">Filter by Category</label>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">All</button>
+                    <button onclick="filterCategory('llm')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🤖 LLMs</button>
+                    <button onclick="filterCategory('image-generation')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎨 Image Gen</button>
+                    <button onclick="filterCategory('video-ai')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎬 Video AI</button>
+                    <button onclick="filterCategory('code-ai')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">💻 Code AI</button>
+                    <button onclick="filterCategory('machine-learning')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🧠 ML</button>
+                </div>
+            </div>
+            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="toolList">
                 <!-- Will be populated dynamically -->
             </div>
@@ -107,10 +152,11 @@
     </main>
 
     <script>
-        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
-        const API_URL = 'https://ai-discovery.onrender.com';
+        const API_URL = 'http://localhost:8000';
         let selectedTools = [];
         let comparisonTools = [];
+        let allAvailableTools = [];
+        let currentCategory = 'all';
 
         async function addToolToCompare() {
             document.getElementById('toolSelector').classList.remove('hidden');
@@ -123,14 +169,36 @@
 
         async function loadAvailableTools() {
             try {
-                const response = await fetch(`${API_URL}/api/rankings?query=machine-learning&limit=20`);
+                const response = await fetch(`${API_URL}/api/rankings?query=ai&limit=100`);
                 const data = await response.json();
 
                 if (data.success && data.data.length > 0) {
-                    const toolList = document.getElementById('toolList');
-                    toolList.innerHTML = data.data.map((tool, idx) => `
+                    allAvailableTools = data.data;
+                    filterCategory('all');
+                }
+            } catch (error) {
+                console.error('Error loading tools:', error);
+            }
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active', 'bg-secondary'));
+            event.target.classList.add('active', 'bg-secondary');
+            
+            // Filter tools
+            let filtered = allAvailableTools;
+            if (category !== 'all') {
+                filtered = allAvailableTools.filter(tool => matchesCategory(tool, category));
+            }
+            
+            // Display filtered tools
+            const toolList = document.getElementById('toolList');
+            toolList.innerHTML = filtered.slice(0, 20).map((tool, idx) => `
                 <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-700 hover:border-secondary cursor-pointer transition">
-                    <input type="checkbox" value="${idx}" onchange="toggleTool(${idx}, this.checked)" 
+                    <input type="checkbox" value="${tool.full_name}" onchange="toggleTool('${tool.full_name}', this.checked)" 
                            class="w-4 h-4 text-secondary bg-gray-700 border-gray-600 rounded focus:ring-secondary">
                     <div class="flex-1">
                         <div class="font-semibold text-sm">${tool.name}</div>
@@ -138,20 +206,31 @@
                     </div>
                 </label>
             `).join('');
-
-                    // Store tools for later reference
-                    window.availableTools = data.data;
-                }
-            } catch (error) {
-                console.error('Error loading tools:', error);
-            }
         }
 
-        function toggleTool(idx, checked) {
-            if (checked && !selectedTools.includes(idx)) {
-                selectedTools.push(idx);
+        function matchesCategory(tool, category) {
+            const topics = (tool.topics || []).map(t => t.toLowerCase()).join(' ');
+            const name = (tool.name || '').toLowerCase();
+            const desc = (tool.description || '').toLowerCase();
+            const searchText = `${topics} ${name} ${desc}`;
+
+            const categoryMap = {
+                'llm': ['llm', 'gpt', 'language-model', 'chatgpt', 'transformer'],
+                'image-generation': ['stable-diffusion', 'image-generation', 'dall-e', 'diffusion', 'image'],
+                'video-ai': ['video-generation', 'text-to-video', 'video'],
+                'code-ai': ['code-generation', 'copilot', 'coding', 'code-assistant'],
+                'machine-learning': ['machine-learning', 'deep-learning', 'ml', 'neural-network', 'ai']
+            };
+
+            const keywords = categoryMap[category] || [category];
+            return keywords.some(kw => searchText.includes(kw));
+        }
+
+        function toggleTool(fullName, checked) {
+            if (checked && !selectedTools.includes(fullName)) {
+                selectedTools.push(fullName);
             } else {
-                selectedTools = selectedTools.filter(i => i !== idx);
+                selectedTools = selectedTools.filter(n => n !== fullName);
             }
         }
 
@@ -166,7 +245,10 @@
                 return;
             }
 
-            comparisonTools = selectedTools.map(idx => window.availableTools[idx]);
+            comparisonTools = selectedTools.map(fullName => 
+                allAvailableTools.find(t => t.full_name === fullName)
+            ).filter(t => t);
+            
             renderComparison();
             closeSelector();
             selectedTools = [];
@@ -181,154 +263,143 @@
             const colors = ['#06B6D4', '#8B5CF6', '#F59E0B'];
 
             container.innerHTML = `
-        <div class="comparison-grid min-w-max">
-            
-            <!-- Header Row -->
-            <div class="comparison-cell comparison-header"></div>
-            ${comparisonTools.map((tool, idx) => `
-                <div class="comparison-cell comparison-header text-center">
-                    <button onclick="removeTool(${idx})" class="float-right text-gray-500 hover:text-red-500">
-                        <span class="material-icons text-sm">close</span>
-                    </button>
-                    <div class="w-16 h-16 rounded-xl mx-auto mb-3 flex items-center justify-center text-3xl" 
-                         style="background: ${colors[idx % colors.length]}">
-                        ${tool.name.substring(0, 1)}
-                    </div>
-                    <h3 class="font-bold text-lg">${tool.name}</h3>
-                    <p class="text-sm text-gray-400">${tool.full_name ? tool.full_name.split('/')[0] : 'GitHub'}</p>
-                </div>
-            `).join('')}
-            
-            <!-- Best For Row -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400 uppercase">Best For</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="text-sm">${tool.language ? `${tool.language} Development` : 'General Purpose'}</div>
-                </div>
-            `).join('')}
-            
-            <!-- Pros Section -->
-            <div class="comparison-cell bg-gray-900">
-                <div class="text-sm font-bold text-blue-400">PROS</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell bg-gray-900">
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500">•</span>
-                            <span>High community engagement</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500">•</span>
-                            <span>${(tool.stars || 0).toLocaleString()} GitHub stars</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500">•</span>
-                            <span>Active development</span>
-                        </li>
-                    </ul>
-                </div>
-            `).join('')}
-            
-            <!-- Cons Section -->
-            <div class="comparison-cell bg-gray-900">
-                <div class="text-sm font-bold text-red-400">CONS</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell bg-gray-900">
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500">•</span>
-                            <span>Learning curve for beginners</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500">•</span>
-                            <span>Documentation could be better</span>
-                        </li>
-                    </ul>
-                </div>
-            `).join('')}
-            
-            <!-- Technical Specs Header -->
-            <div class="comparison-cell bg-gray-800">
-                <div class="text-sm font-bold text-blue-400">TECHNICAL SPECS</div>
-            </div>
-            ${comparisonTools.map(() => `<div class="comparison-cell bg-gray-800"></div>`).join('')}
-            
-            <!-- Stars -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">GitHub Stars</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="font-semibold">${(tool.stars || 0).toLocaleString()}</div>
-                </div>
-            `).join('')}
-            
-            <!-- Forks -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">Forks</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="font-semibold">${(tool.forks || 0).toLocaleString()}</div>
-                </div>
-            `).join('')}
-            
-            <!-- Language -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">Language</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="font-semibold">${tool.language || 'Multiple'}</div>
-                </div>
-            `).join('')}
-            
-            <!-- Score -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">AI Score</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="flex items-center gap-2">
-                        <div class="flex-1 bg-gray-700 h-2 rounded-full overflow-hidden">
-                            <div class="bg-secondary h-full" style="width: ${(tool.BoostedScore * 100)}%"></div>
-                        </div>
-                        <span class="font-bold text-sm">${(tool.BoostedScore * 10).toFixed(1)}/10</span>
-                    </div>
-                </div>
-            `).join('')}
-            
-            <!-- Ecosystem Section -->
-            <div class="comparison-cell bg-gray-800">
-                <div class="text-sm font-bold text-blue-400">ECOSYSTEM & SECURITY</div>
-            </div>
-            ${comparisonTools.map(() => `<div class="comparison-cell bg-gray-800"></div>`).join('')}
-            
-            <!-- Contributors -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">Contributors</div>
-            </div>
-            ${comparisonTools.map(tool => `
-                <div class="comparison-cell">
-                    <div class="font-semibold">${tool.contributors_count || 'N/A'}</div>
-                </div>
-            `).join('')}
-            
-            <!-- Open Source -->
-            <div class="comparison-cell">
-                <div class="text-sm font-semibold text-gray-400">Open Source</div>
-            </div>
-            ${comparisonTools.map(() => `
-                <div class="comparison-cell">
-                    <span class="material-icons text-green-500">check_circle</span>
-                </div>
-            `).join('')}
-            
-        </div>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th class="row-label"></th>
+                    ${comparisonTools.map((tool, idx) => `
+                        <th>
+                            <button onclick="removeTool(${idx})" class="float-right text-gray-500 hover:text-red-500 -mt-2">
+                                <span class="material-icons text-sm">close</span>
+                            </button>
+                            <div class="w-16 h-16 rounded-xl mx-auto mb-3 flex items-center justify-center text-2xl font-bold" 
+                                 style="background: ${colors[idx % colors.length]}">
+                                ${tool.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <h3 class="font-bold text-lg mb-1">${tool.name}</h3>
+                            <p class="text-xs text-gray-400">${tool.full_name || 'GitHub'}</p>
+                        </th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Overview Section -->
+                <tr>
+                    <td colspan="${comparisonTools.length + 1}" class="section-header">📊 Overview</td>
+                </tr>
+                <tr>
+                    <td class="row-label">Description</td>
+                    ${comparisonTools.map(tool => `
+                        <td><div class="text-sm text-gray-300">${tool.description || 'No description available'}</div></td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="row-label">Best For</td>
+                    ${comparisonTools.map(tool => `
+                        <td><div class="text-sm">${tool.language ? `${tool.language} Development` : 'General AI Tasks'}</div></td>
+                    `).join('')}
+                </tr>
+                
+                <!-- Metrics Section -->
+                <tr>
+                    <td colspan="${comparisonTools.length + 1}" class="section-header">⭐ Metrics</td>
+                </tr>
+                <tr>
+                    <td class="row-label">GitHub Stars</td>
+                    ${comparisonTools.map(tool => `
+                        <td><div class="font-bold text-lg">${(tool.stars || 0).toLocaleString()}</div></td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="row-label">Forks</td>
+                    ${comparisonTools.map(tool => `
+                        <td><div class="font-semibold">${(tool.forks || 0).toLocaleString()}</div></td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="row-label">AI Score</td>
+                    ${comparisonTools.map(tool => `
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-full" style="width: ${(tool.BoostedScore * 100)}%"></div>
+                                </div>
+                                <span class="font-bold">${(tool.BoostedScore * 10).toFixed(1)}</span>
+                            </div>
+                        </td>
+                    `).join('')}
+                </tr>
+                
+                <!-- Technical Section -->
+                <tr>
+                    <td colspan="${comparisonTools.length + 1}" class="section-header">🔧 Technical</td>
+                </tr>
+                <tr>
+                    <td class="row-label">Language</td>
+                    ${comparisonTools.map(tool => `
+                        <td><span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-sm font-medium">${tool.language || 'Multiple'}</span></td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="row-label">Contributors</td>
+                    ${comparisonTools.map(tool => `
+                        <td><div class="font-semibold">${tool.contributors_count || 'N/A'}</div></td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="row-label">Open Source</td>
+                    ${comparisonTools.map(() => `
+                        <td><span class="material-icons text-green-500">check_circle</span></td>
+                    `).join('')}
+                </tr>
+                
+                <!-- Pros & Cons Section -->
+                <tr>
+                    <td colspan="${comparisonTools.length + 1}" class="section-header">✅ Pros</td>
+                </tr>
+                <tr>
+                    <td class="row-label"></td>
+                    ${comparisonTools.map(tool => `
+                        <td>
+                            <ul class="space-y-1.5 text-sm">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-green-500 mt-0.5">✓</span>
+                                    <span>High community engagement</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-green-500 mt-0.5">✓</span>
+                                    <span>${(tool.stars || 0).toLocaleString()} stars</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-green-500 mt-0.5">✓</span>
+                                    <span>Active development</span>
+                                </li>
+                            </ul>
+                        </td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td colspan="${comparisonTools.length + 1}" class="section-header">❌ Cons</td>
+                </tr>
+                <tr>
+                    <td class="row-label"></td>
+                    ${comparisonTools.map(() => `
+                        <td>
+                            <ul class="space-y-1.5 text-sm">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-red-500 mt-0.5">✗</span>
+                                    <span>Learning curve for beginners</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-red-500 mt-0.5">✗</span>
+                                    <span>Documentation needs improvement</span>
+                                </li>
+                            </ul>
+                        </td>
+                    `).join('')}
+                </tr>
+            </tbody>
+        </table>
     `;
         }
 
