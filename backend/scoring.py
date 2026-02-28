@@ -13,19 +13,19 @@ class AIToolScorer:
     """
     
     def __init__(self):
-        # Optimized weights for discovering emerging repos
+        # ENHANCED weights - More aggressive for discovering emerging repos
         self.weights = {
-            "GrowthRate": 0.45,      # Increased: Most important for emerging tools
-            "Activity": 0.25,         # Development momentum
-            "CommunityStrength": 0.15, # Reduced: Less important for new repos
-            "Freshness": 0.15         # Recency matters
+            "GrowthRate": 0.50,      # Increased: Growth is KING for discovery
+            "Activity": 0.25,         # Maintained: Development momentum matters
+            "CommunityStrength": 0.10, # Reduced: Less important for NEW repos
+            "Freshness": 0.15         # Maintained: Recency matters
         }
         
-        # Multi-tier booster system
+        # ENHANCED multi-tier booster system - More aggressive
         self.booster_tiers = [
-            {"name": "Hidden Gem", "star_max": 1000, "growth_min": 0.4, "boost": 1.35},
-            {"name": "Rising Star", "star_max": 3000, "growth_min": 0.3, "boost": 1.25},
-            {"name": "Trending", "star_max": 10000, "growth_min": 0.2, "boost": 1.15}
+            {"name": "Hidden Gem", "star_max": 1000, "growth_min": 0.35, "boost": 1.40},  # +40% boost
+            {"name": "Rising Star", "star_max": 3000, "growth_min": 0.25, "boost": 1.30},  # +30% boost
+            {"name": "Trending", "star_max": 10000, "growth_min": 0.15, "boost": 1.20}     # +20% boost
         ]
         
     
@@ -96,9 +96,8 @@ class AIToolScorer:
     
     def apply_early_stage_booster(self, df):
         """
-        Step 4: Multi-Tier Booster System
-        Applies different boost levels based on repo size and growth
-        Discovers hidden gems at various stages
+        Step 4: ENHANCED Multi-Tier Booster System
+        Applies different boost levels + quality multipliers
         """
         boost_tiers = []
         boosted_scores = []
@@ -107,11 +106,17 @@ class AIToolScorer:
             tier_name = "None"
             boosted = row["FinalScore"]
             
+            # Apply tier boost
             for tier in self.booster_tiers:
                 if (row["GrowthRate_N"] >= tier["growth_min"] and 
                     row["stars"] < tier["star_max"]):
                     tier_name = tier["name"]
                     boosted = row["FinalScore"] * tier["boost"]
+                    
+                    # QUALITY MULTIPLIER: Extra boost for high-quality emerging repos
+                    if row["Activity_N"] > 0.5 and row["Freshness_N"] > 0.7:
+                        boosted *= 1.1  # +10% for very active + fresh repos
+                    
                     break
             
             boost_tiers.append(tier_name)
@@ -129,29 +134,29 @@ class AIToolScorer:
         Main scoring pipeline
         Returns ranked DataFrame
         """
-        print("🔄 Starting scoring pipeline...")
+        print("Starting scoring pipeline...")
         
         # Step 1: Feature Engineering
         df = self.calculate_features(repos)
-        print("✅ Features calculated")
+        print("Features calculated")
         
         # Step 2: Normalization
         df = self.normalize_features(df)
-        print("✅ Features normalized")
+        print("Features normalized")
         
         # Step 3: Weighted Scoring
         df = self.calculate_weighted_score(df)
-        print("✅ Weighted scores calculated")
+        print("Weighted scores calculated")
         
         # Step 4: Early-Stage Booster
         df = self.apply_early_stage_booster(df)
-        print("✅ Booster applied")
+        print("Booster applied")
         
         # Final ranking
         df_ranked = df.sort_values("BoostedScore", ascending=False).reset_index(drop=True)
         df_ranked.index = df_ranked.index + 1  # Start from rank 1
         
-        print(f"✅ Ranked {len(df_ranked)} tools")
+        print(f"Ranked {len(df_ranked)} tools")
         
         return df_ranked
     

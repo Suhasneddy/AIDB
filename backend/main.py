@@ -2,6 +2,7 @@ import asyncio
 import threading
 import time
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -10,10 +11,30 @@ from datafetcher import fetch_all_ai_repos, fetch_github_repos
 from scoring import AIToolScorer
 from cache_manager import cache
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler for startup and shutdown"""
+    print("Starting AI Tool Discovery API v2.0...")
+    
+    # CLEAR OLD CACHE on startup to force fresh data
+    cache.clear()
+    print("Cache cleared - fetching fresh data...")
+    
+    # Start preloading IMMEDIATELY (blocking to ensure fresh data)
+    _preload_data()
+    
+    # Start the periodic refresh scheduler
+    refresh_thread = threading.Thread(target=_schedule_refresh, daemon=True)
+    refresh_thread.start()
+    
+    yield
+    # Cleanup on shutdown (if needed)
+
 app = FastAPI(
     title="AI Tool Discovery API",
     description="Real-time AI tool ranking with growth-based intelligence",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # Enable CORS - Allow ALL origins so Vercel frontend can talk to Render backend
@@ -38,7 +59,7 @@ def _preload_data():
     """
     global _data_ready
     print("\n" + "=" * 60)
-    print("🚀 PRELOADING AI TOOL DATA...")
+    print("FETCHING FRESH AI TOOL DATA...")
     print("=" * 60)
 
     try:
@@ -86,8 +107,8 @@ def _preload_data():
         cache.set("emerging_tools", emerging_df.to_dict("records"))
 
         _data_ready = True
-        print(f"\n✅ PRELOAD COMPLETE! {len(all_results)} tools cached and ready.")
-        print("⚡ All API endpoints will now respond INSTANTLY!\n")
+        print(f"\nFRESH DATA LOADED! {len(all_results)} tools cached and ready.")
+        print("All API endpoints will now respond INSTANTLY!\n")
 
     except Exception as e:
         print(f"❌ Preload error: {e}")
@@ -123,22 +144,8 @@ def _schedule_refresh():
     """Refresh data every 30 minutes in a background thread."""
     while True:
         time.sleep(1800)  # 30 minutes
-        print("🔄 Scheduled data refresh starting...")
+        print("Scheduled data refresh starting...")
         _preload_data()
-
-
-@app.on_event("startup")
-async def startup_event():
-    """On server start: preload data in background thread."""
-    print("🚀 Starting AI Tool Discovery API v2.0...")
-
-    # Start preloading in a background thread (non-blocking)
-    thread = threading.Thread(target=_preload_data, daemon=True)
-    thread.start()
-
-    # Start the periodic refresh scheduler
-    refresh_thread = threading.Thread(target=_schedule_refresh, daemon=True)
-    refresh_thread.start()
 
 
 @app.get("/")

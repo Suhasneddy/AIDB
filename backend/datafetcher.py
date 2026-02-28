@@ -110,8 +110,8 @@ def fetch_all_ai_repos(target_count=100):
 
     all_repos = {}  # Use dict keyed by full_name for deduplication
 
-    # Fetch all queries in parallel (max 6 threads to respect rate limits)
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    # Fetch all queries in parallel (max 3 threads to respect rate limits)
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {
             executor.submit(_fetch_one_query, query, 30): query
             for query in AI_QUERIES
