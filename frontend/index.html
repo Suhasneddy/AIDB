@@ -641,8 +641,8 @@
         // ─── Category Ribbon with AI Sources ───
         const RIBBON_CATEGORIES = [
             { name: "All Tools", icon: "apps", query: "ai", active: true },
-            { name: "GitHub OS", icon: "terminal", query: "github" },
-            { name: "Hugging Face", icon: "psychology", query: "huggingface" },
+            { name: "GitHub OS", icon: "terminal", query: "github", source: "github" },
+            { name: "Hugging Face", icon: "psychology", query: "huggingface", source: "huggingface" },
             { name: "Generative AI", icon: "auto_awesome", query: "generative-ai" },
             { name: "LLMs", icon: "smart_toy", query: "llm" },
             { name: "Image Gen", icon: "image", query: "image-generation" },
@@ -653,8 +653,6 @@
             { name: "Computer Vision", icon: "visibility", query: "computer-vision" },
             { name: "Machine Learning", icon: "model_training", query: "machine-learning" },
             { name: "Research", icon: "science", query: "research" },
-            { name: "Data Science", icon: "analytics", query: "data-science" },
-            { name: "Robotics", icon: "precision_manufacturing", query: "robotics" },
         ];
 
         let activeCategory = 0;
@@ -704,7 +702,15 @@
             `).join('');
 
             try {
-                const response = await fetch(`${API_URL}/api/rankings?query=${encodeURIComponent(query)}&limit=6`);
+                // Route to different endpoints based on source
+                const cat = RIBBON_CATEGORIES[activeCategory];
+                let url;
+                if (cat && cat.source === 'huggingface') {
+                    url = `${API_URL}/api/rankings/huggingface?limit=6`;
+                } else {
+                    url = `${API_URL}/api/rankings?query=${encodeURIComponent(query)}&limit=6`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.success && data.data.length > 0) {

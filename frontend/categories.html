@@ -197,29 +197,17 @@
                     <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Source Filter</h3>
                     <div class="space-y-3">
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input checked
+                            <input checked id="filterGithub" onchange="applyFilters()"
                                 class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
                                 type="checkbox" />
                             <span class="text-sm text-slate-300 group-hover:text-white transition-colors">GitHub</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input checked
+                            <input checked id="filterHuggingface" onchange="applyFilters()"
                                 class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
                                 type="checkbox" />
                             <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Hugging
                                 Face</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
-                                type="checkbox" />
-                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Python
-                                Papers</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
-                                type="checkbox" />
-                            <span
-                                class="text-sm text-slate-300 group-hover:text-white transition-colors">Web-Based</span>
                         </label>
                     </div>
                 </div>
@@ -230,31 +218,33 @@
                     <div class="space-y-6">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 mb-3">License</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">MIT</span>
-                                <span
-                                    class="px-2 py-1 rounded border border-primary bg-primary/10 text-[10px] font-bold text-primary uppercase cursor-pointer">Apache</span>
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">Paid</span>
+                            <div class="flex flex-wrap gap-2" id="licenseFilters">
+                                <span data-filter="mit" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">MIT</span>
+                                <span data-filter="apache" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">Apache</span>
+                                <span data-filter="gpl" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">GPL</span>
                             </div>
                         </div>
                         <div>
                             <p class="text-xs font-semibold text-slate-500 mb-3">Framework</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">PyTorch</span>
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">TensorFlow</span>
+                            <div class="flex flex-wrap gap-2" id="frameworkFilters">
+                                <span data-filter="pytorch" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">PyTorch</span>
+                                <span data-filter="tensorflow" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">TensorFlow</span>
+                                <span data-filter="jax" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">JAX</span>
                             </div>
                         </div>
                         <div>
                             <p class="text-xs font-semibold text-slate-500 mb-3">Deployment</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Cloud</span>
-                                <span
-                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Local</span>
+                            <div class="flex flex-wrap gap-2" id="deploymentFilters">
+                                <span data-filter="cloud" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Cloud</span>
+                                <span data-filter="local" onclick="toggleTag(this)"
+                                    class="filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Local</span>
                             </div>
                         </div>
                     </div>
@@ -340,6 +330,7 @@
 
         let currentCategory = CATEGORIES[0];
         let currentPage = 1;
+        let allFetchedTools = [];  // Store all tools for client-side filtering
         const ITEMS_PER_PAGE = 6;
         const gradientColors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
@@ -400,16 +391,8 @@
                 const data = await response.json();
 
                 if (data.success && data.data.length > 0) {
-                    const tools = data.data;
-                    const totalPages = Math.ceil(tools.length / ITEMS_PER_PAGE);
-                    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-                    const pageTools = tools.slice(start, start + ITEMS_PER_PAGE);
-
-                    document.getElementById('categorySubtitle').textContent =
-                        `Discover ${tools.length} high-performance AI tools and research papers.`;
-
-                    renderToolCards(pageTools);
-                    renderPagination(totalPages, tools.length);
+                    allFetchedTools = data.data;  // Store for client-side filtering
+                    applyFilters();  // Apply any active filters
                 } else {
                     grid.innerHTML = `
                         <div class="col-span-full text-center py-20">
@@ -571,6 +554,81 @@
                     return;
                 }
             }
+        }
+
+        // ─── Sidebar Filter Logic ───
+        function toggleTag(el) {
+            const isActive = el.classList.contains('bg-primary/10');
+            if (isActive) {
+                el.className = 'filter-tag px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all';
+            } else {
+                el.className = 'filter-tag px-2 py-1 rounded border border-primary bg-primary/10 text-[10px] font-bold text-primary uppercase cursor-pointer transition-all';
+            }
+            applyFilters();
+        }
+
+        function getActiveFilters(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            return Array.from(container.querySelectorAll('.filter-tag.bg-primary\\/10')).map(el => el.dataset.filter);
+        }
+
+        function applyFilters() {
+            let tools = [...allFetchedTools];
+
+            // Source filters
+            const showGithub = document.getElementById('filterGithub')?.checked ?? true;
+            const showHF = document.getElementById('filterHuggingface')?.checked ?? true;
+            tools = tools.filter(t => {
+                const src = (t.source || 'github').toLowerCase();
+                if (src === 'github' && !showGithub) return false;
+                if (src === 'huggingface' && !showHF) return false;
+                return true;
+            });
+
+            // License filters
+            const activeLicenses = getActiveFilters('licenseFilters');
+            if (activeLicenses.length > 0) {
+                tools = tools.filter(t => {
+                    const license = (t.license || '').toLowerCase();
+                    return activeLicenses.some(l => license.includes(l));
+                });
+            }
+
+            // Framework filters
+            const activeFrameworks = getActiveFilters('frameworkFilters');
+            if (activeFrameworks.length > 0) {
+                tools = tools.filter(t => {
+                    const searchText = ((t.topics || []).join(' ') + ' ' + (t.description || '') + ' ' + (t.language || '')).toLowerCase();
+                    return activeFrameworks.some(f => searchText.includes(f));
+                });
+            }
+
+            // Deployment filters
+            const activeDeployment = getActiveFilters('deploymentFilters');
+            if (activeDeployment.length > 0) {
+                tools = tools.filter(t => {
+                    const searchText = ((t.topics || []).join(' ') + ' ' + (t.description || '')).toLowerCase();
+                    return activeDeployment.some(d => searchText.includes(d));
+                });
+            }
+
+            // Sort
+            const sortVal = document.getElementById('sortSelect')?.value || 'popular';
+            if (sortVal === 'popular') tools.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+            else if (sortVal === 'recent') tools.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
+            else if (sortVal === 'rated') tools.sort((a, b) => (b.BoostedScore || 0) - (a.BoostedScore || 0));
+
+            // Paginate and render
+            const totalPages = Math.ceil(tools.length / ITEMS_PER_PAGE);
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageTools = tools.slice(start, start + ITEMS_PER_PAGE);
+
+            document.getElementById('categorySubtitle').textContent =
+                `Discover ${tools.length} high-performance AI tools and research papers.`;
+
+            renderToolCards(pageTools);
+            renderPagination(totalPages, tools.length);
         }
 
         // ─── Initialize ───

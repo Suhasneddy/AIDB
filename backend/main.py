@@ -10,7 +10,7 @@ from typing import Optional
 import uvicorn
 from dotenv import load_dotenv
 
-from datafetcher import fetch_all_ai_repos, fetch_github_repos
+from datafetcher import fetch_all_ai_repos, fetch_github_repos, fetch_huggingface_models
 from scoring import AIToolScorer
 from cache_manager import cache
 from database import (
@@ -54,21 +54,37 @@ def _preload_data():
     print("=" * 60)
 
     try:
-        # Step 1: Fetch 100 repos in parallel (~5 seconds)
+        # Step 1: Fetch 100 GitHub repos in parallel (~5 seconds)
         repos = fetch_all_ai_repos(target_count=100)
 
         if not repos:
             print("❌ No repos fetched. Check GITHUB_TOKEN.")
             return
 
-        # Step 2: Score and rank them
+        # Step 2: Score and rank GitHub repos
         ranked_df = scorer.rank_tools(repos)
         all_results = ranked_df.to_dict("records")
 
-        # Step 3: Cache the full dataset
+        # Step 3: Cache the full GitHub dataset
         cache.set("all_tools", all_results)
+        cache.set("github_tools", all_results)  # Explicit GitHub-only cache
 
-        # Step 4: Pre-build category caches
+        # Step 4: Fetch and cache Hugging Face models
+        try:
+            hf_models = fetch_huggingface_models(limit=50)
+            if hf_models:
+                hf_ranked = scorer.rank_tools(hf_models)
+                hf_results = hf_ranked.to_dict("records")
+                cache.set("huggingface_tools", hf_results)
+                print(f"✅ Cached {len(hf_results)} Hugging Face models")
+            else:
+                cache.set("huggingface_tools", [])
+                print("⚠️ No HF models fetched")
+        except Exception as hf_err:
+            print(f"⚠️ HF fetch failed (non-critical): {hf_err}")
+            cache.set("huggingface_tools", [])
+
+        # Step 5: Pre-build category caches
         categories_map = {
             "ai": "ai OR artificial-intelligence",
             "machine-learning": "machine-learning OR deep-learning",
@@ -83,22 +99,22 @@ def _preload_data():
         }
 
         for cat_key, _ in categories_map.items():
-            # Filter from the already-fetched data by matching topics
             cat_results = [t for t in all_results if _matches_category(t, cat_key)]
             if cat_results:
                 cache.set(f"rankings_{cat_key}", cat_results)
 
-        # Step 5: Cache trending (top by BoostedScore)
+        # Step 6: Cache trending (top by BoostedScore)
         cache.set("rankings_ai_8", all_results[:8])
         cache.set("rankings_machine-learning_10", all_results[:10])
         cache.set("rankings_github_6", all_results[:6])
 
-        # Step 6: Cache emerging tools
+        # Step 7: Cache emerging tools
         emerging_df = scorer.get_emerging_tools(ranked_df)
         cache.set("emerging_tools", emerging_df.to_dict("records"))
 
         _data_ready = True
-        print(f"\n✅ PRELOAD COMPLETE! {len(all_results)} tools cached and ready.")
+        total_cached = len(all_results) + len(cache.get("huggingface_tools") or [])
+        print(f"\n✅ PRELOAD COMPLETE! {total_cached} tools cached (GitHub + HF).")
         print("⚡ All API endpoints will now respond INSTANTLY!\n")
 
     except Exception as e:
@@ -164,6 +180,7 @@ def root():
         "endpoints": [
             "/api/rankings",
             "/api/rankings?query=llm&limit=20",
+            "/api/rankings/huggingface",
             "/api/emerging",
             "/api/categories",
             "/api/tool/{owner/repo}",
@@ -228,6 +245,41 @@ def get_rankings(query: str = "ai", limit: int = 20):
 
     except Exception as e:
         print(f"Error: {e}")
+        return {"success": False, "message": str(e), "data": []}
+
+
+@app.get("/api/rankings/huggingface")
+def get_hf_rankings(limit: int = 20):
+    """Get ranked Hugging Face models — cached and instant after startup."""
+    try:
+        cached_data = cache.get("huggingface_tools")
+        if cached_data:
+            return {
+                "success": True,
+                "total": len(cached_data),
+                "source": "huggingface",
+                "from_cache": True,
+                "data": cached_data[:limit]
+            }
+
+        # Live fetch if cache empty
+        print("📡 HF cache miss - fetching live...")
+        hf_models = fetch_huggingface_models(limit=limit)
+        if hf_models:
+            hf_ranked = scorer.rank_tools(hf_models)
+            results = hf_ranked.to_dict("records")
+            cache.set("huggingface_tools", results)
+            return {
+                "success": True,
+                "total": len(results),
+                "source": "huggingface",
+                "from_cache": False,
+                "data": results[:limit]
+            }
+
+        return {"success": False, "message": "No HF models found. Try again later.", "data": []}
+    except Exception as e:
+        print(f"HF Error: {e}")
         return {"success": False, "message": str(e), "data": []}
 
 

@@ -265,15 +265,32 @@
             }
 
             try {
-                // Fetch tool data
-                const response = await fetch(`${API_URL}/api/rankings?query=${encodeURIComponent(toolName)}&limit=1`);
-                const data = await response.json();
+                let tool = null;
 
-                if (data.success && data.data.length > 0) {
-                    const tool = data.data[0];
+                // Try exact match via /api/tool/{owner}/{repo}
+                if (toolName.includes('/')) {
+                    const [owner, repo] = toolName.split('/');
+                    const exactRes = await fetch(`${API_URL}/api/tool/${owner}/${repo}`);
+                    const exactData = await exactRes.json();
+                    if (exactData.success && exactData.data) {
+                        tool = exactData.data;
+                    }
+                }
+
+                // Fallback: search for the tool by name
+                if (!tool) {
+                    const searchRes = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(toolName)}&limit=5`);
+                    const searchData = await searchRes.json();
+                    if (searchData.success && searchData.data && searchData.data.length > 0) {
+                        // Find closest match
+                        tool = searchData.data.find(t => t.full_name === toolName) || searchData.data[0];
+                    }
+                }
+
+                if (tool) {
                     displayTool(tool);
                 } else {
-                    document.getElementById('toolContent').innerHTML = '<div class="loading">Tool not found</div>';
+                    document.getElementById('toolContent').innerHTML = '<div class="loading">Tool not found. Try searching from the homepage.</div>';
                 }
             } catch (error) {
                 document.getElementById('toolContent').innerHTML = '<div class="loading">Error loading tool details</div>';
