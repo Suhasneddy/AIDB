@@ -1,57 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html class="dark" lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories - AIDB | Browse AI Tools by Category</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Categories - AIDB | Browse AI Tools</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#6366f1',
-                        'secondary': '#8b5cf6',
-                        'accent': '#ec4899',
+                        "primary": "#6366f1",
+                        "secondary": "#8b5cf6",
+                        "accent": "#ec4899",
+                        "background-dark": "#0F1419",
                     },
-                    animation: {
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'fade-in': 'fadeIn 0.6s ease-out',
-                        'scale-in': 'scaleIn 0.4s ease-out',
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
                     },
-                    keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(30px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.95)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        },
-                    }
-                }
-            }
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
         }
     </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             background: #0F1419;
         }
 
-        .glass {
+        .glass-sidebar {
+            background: rgba(15, 20, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -8px rgba(99, 102, 241, 0.2);
         }
 
         .glass-strong {
@@ -60,325 +61,514 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .sticky-header {
+            background: rgba(15, 20, 25, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .hover-lift:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.25);
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
         }
 
-        .category-gradient-1 {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        .category-gradient-2 {
-            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3b4354;
+            border-radius: 10px;
         }
 
-        .category-gradient-3 {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        /* Loading animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
 
-        .category-gradient-4 {
-            background: linear-gradient(135deg, #10b981, #06b6d4);
+        .loading-shimmer {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
 
-        .category-gradient-5 {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        /* Fade-in for cards */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .category-gradient-6 {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-        }
-
-        .category-gradient-7 {
-            background: linear-gradient(135deg, #f43f5e, #f59e0b);
-        }
-
-        .category-gradient-8 {
-            background: linear-gradient(135deg, #14b8a6, #22c55e);
-        }
-
-        .category-gradient-9 {
-            background: linear-gradient(135deg, #a855f7, #6366f1);
-        }
-
-        .category-gradient-10 {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-
-        html {
-            scroll-behavior: smooth;
+        .animate-card {
+            animation: fadeSlideUp 0.4s ease-out forwards;
+            opacity: 0;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-background-dark text-slate-100 font-display">
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-strong">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="index.html" class="flex items-center gap-3 group">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition">
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 sticky-header px-4 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <!-- AIDB Logo -->
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="relative">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition">
+                    </div>
+                    <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
+                        <span class="material-symbols-outlined text-white text-2xl">auto_awesome</span>
+                    </div>
+                </div>
+                <span
+                    class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    AIDB
+                </span>
+            </a>
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-slate-300 hover:text-primary transition-colors text-sm font-semibold"
+                    href="index.html">Home</a>
+                <a class="text-slate-300 hover:text-primary transition-colors text-sm font-semibold"
+                    href="rankings.html">Rankings</a>
+                <a class="text-slate-300 hover:text-primary transition-colors text-sm font-semibold"
+                    href="compare.html">Compare</a>
+                <a class="text-white border-b-2 border-primary pb-1 text-sm font-semibold"
+                    href="categories.html">Categories</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Search -->
+            <div class="relative hidden sm:block">
+                <span
+                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                <input id="headerSearch"
+                    class="bg-slate-800/50 border border-slate-700/50 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-slate-400 focus:ring-primary focus:border-primary w-64"
+                    placeholder="Search AI tools..." type="text"
+                    onkeypress="if(event.key==='Enter') { window.location.href='search.html?q='+encodeURIComponent(this.value); }" />
+            </div>
+            <a href="login.html"
+                class="hidden md:block px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all hover:scale-105 text-sm">
+                Get Started
+            </a>
+            <a href="search.html"
+                class="p-2.5 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors sm:hidden">
+                <span class="material-symbols-outlined text-xl">search</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Layout: Sidebar + Content -->
+    <div class="flex h-[calc(100vh-73px)]">
+
+        <!-- Sidebar -->
+        <aside class="w-80 glass-sidebar flex-shrink-0 overflow-y-auto custom-scrollbar hidden lg:block p-6">
+            <div class="space-y-8">
+                <!-- Category Navigation -->
+                <div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Deep Discovery</h3>
+                    <div id="sidebarCategories" class="space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Source Filter -->
+                <div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Source Filter</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input checked
+                                class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
+                                type="checkbox" />
+                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">GitHub</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input checked
+                                class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
+                                type="checkbox" />
+                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Hugging
+                                Face</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
+                                type="checkbox" />
+                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Python
+                                Papers</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary h-5 w-5"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-slate-300 group-hover:text-white transition-colors">Web-Based</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Technical Filters -->
+                <div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Technical Filters</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 mb-3">License</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">MIT</span>
+                                <span
+                                    class="px-2 py-1 rounded border border-primary bg-primary/10 text-[10px] font-bold text-primary uppercase cursor-pointer">Apache</span>
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 uppercase hover:border-primary hover:text-primary cursor-pointer transition-all">Paid</span>
+                            </div>
                         </div>
-                        <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
-                            <span class="material-icons text-white text-2xl">auto_awesome</span>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 mb-3">Framework</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">PyTorch</span>
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">TensorFlow</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 mb-3">Deployment</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Cloud</span>
+                                <span
+                                    class="px-2 py-1 rounded border border-slate-700 text-[10px] font-bold text-slate-400 hover:border-primary hover:text-primary cursor-pointer transition-all">Local</span>
+                            </div>
                         </div>
                     </div>
-                    <span
-                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                        AIDB
-                    </span>
-                </a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="index.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Home</a>
-                    <a href="rankings.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Rankings</a>
-                    <a href="compare.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Compare</a>
-                    <a href="categories.html"
-                        class="text-sm font-semibold text-white hover:text-primary transition-colors">Categories</a>
-                </div>
-                <div class="flex items-center gap-4">
-                    <a href="search.html" class="p-3 glass rounded-xl hover:bg-white/10 transition">
-                        <span class="material-icons text-white">search</span>
-                    </a>
                 </div>
             </div>
-        </div>
-    </nav>
+        </aside>
 
-    <!-- Header -->
-    <section class="pt-28 pb-10 px-4 max-w-7xl mx-auto animate-fade-in">
-        <div class="text-center mb-12">
-            <h1 class="text-5xl md:text-6xl font-black text-white mb-4">
-                Browse by <span
-                    class="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Category</span>
-            </h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-                Explore AI tools organized by what they do. Click any category to see the best tools in that space.
-            </p>
-        </div>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-background-dark p-6 lg:p-8 custom-scrollbar">
+            <div class="max-w-7xl mx-auto">
 
-        <!-- Category Grid -->
-        <div id="categoryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-16">
-            <!-- Filled by JavaScript -->
-        </div>
-    </section>
+                <!-- Page Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                        <h1 id="categoryTitle" class="text-3xl font-bold text-white mb-2">LLMs & Chatbots</h1>
+                        <p id="categorySubtitle" class="text-slate-400">Discover high-performance AI tools and research
+                            papers.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-400">Sort by:</span>
+                        <select id="sortSelect"
+                            class="bg-slate-800 border-slate-700 rounded-lg text-sm text-slate-200 focus:ring-primary focus:border-primary"
+                            onchange="loadCurrentCategory()">
+                            <option value="popular">Most Popular</option>
+                            <option value="recent">Recently Added</option>
+                            <option value="rated">Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
 
-    <!-- Category Results -->
-    <section id="resultsSection" class="hidden max-w-7xl mx-auto px-4 pb-20">
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <button onclick="showAllCategories()"
-                    class="text-primary hover:text-white transition font-semibold mb-2 flex items-center gap-1">
-                    <span class="material-icons text-sm">arrow_back</span> All Categories
+                <!-- Tool Cards Grid -->
+                <div id="toolCardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="mt-12 flex items-center justify-center gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Category Drawer (toggle) -->
+    <div id="mobileCategoryDrawer" class="fixed inset-0 z-50 hidden lg:hidden">
+        <div class="absolute inset-0 bg-black/60" onclick="toggleMobileDrawer()"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-80 glass-sidebar overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-white font-bold text-lg">Categories</h3>
+                <button onclick="toggleMobileDrawer()" class="text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
                 </button>
-                <h2 id="resultsTitle" class="text-3xl font-black text-white"></h2>
-                <p id="resultsSubtitle" class="text-gray-400 mt-1"></p>
+            </div>
+            <div id="mobileSidebarCategories" class="space-y-1">
+                <!-- Populated by JS -->
             </div>
         </div>
+    </div>
 
-        <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Filled by JavaScript -->
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="relative z-10 border-t border-white/10 mt-10">
-        <div class="max-w-7xl mx-auto px-4 py-8 text-center text-sm text-gray-500">
-            © 2025 AIDB — IMDB for AI Tools. Built with ❤️
-        </div>
-    </footer>
+    <!-- Mobile filter toggle button -->
+    <button onclick="toggleMobileDrawer()"
+        class="fixed bottom-6 left-6 z-40 lg:hidden bg-gradient-to-r from-primary to-secondary p-4 rounded-full shadow-lg shadow-primary/30 hover:scale-110 transition-transform">
+        <span class="material-symbols-outlined text-white text-xl">filter_list</span>
+    </button>
 
     <script>
-        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
+        // ⚡ Backend API URL
         const API_URL = 'https://ai-discovery.onrender.com';
 
+        // Category definitions
         const CATEGORIES = [
-            { name: "LLMs & Chatbots", icon: "🤖", query: "llm", gradient: "category-gradient-1", desc: "Large language models, GPT, Claude, Llama" },
-            { name: "Image Generation", icon: "🎨", query: "image-generation", gradient: "category-gradient-2", desc: "Stable Diffusion, DALL-E, Midjourney" },
-            { name: "Video AI", icon: "🎬", query: "video-ai", gradient: "category-gradient-3", desc: "Text-to-video, video editing, deepfakes" },
-            { name: "Audio & Music", icon: "🎵", query: "audio-ai", gradient: "category-gradient-4", desc: "Text-to-speech, voice cloning, music AI" },
-            { name: "Code AI", icon: "💻", query: "code-ai", gradient: "category-gradient-5", desc: "Copilot, code generation, AI coding" },
-            { name: "Computer Vision", icon: "👁️", query: "computer-vision", gradient: "category-gradient-6", desc: "Object detection, image classification" },
-            { name: "NLP & Text", icon: "💬", query: "nlp", gradient: "category-gradient-7", desc: "Sentiment analysis, translation, NER" },
-            { name: "Research & ML", icon: "🔬", query: "research", gradient: "category-gradient-8", desc: "Papers, benchmarks, ML frameworks" },
-            { name: "All AI Tools", icon: "⚡", query: "ai", gradient: "category-gradient-9", desc: "Everything AI — full collection" },
-            { name: "Machine Learning", icon: "🧠", query: "machine-learning", gradient: "category-gradient-10", desc: "ML frameworks, deep learning, neural nets" },
+            { name: "LLMs & Chatbots", icon: "psychology", query: "llm", color: "primary" },
+            { name: "Image Generation", icon: "image", query: "image-generation", color: "purple-500" },
+            { name: "Audio & Music", icon: "audio_file", query: "audio-ai", color: "green-500" },
+            { name: "Code Assistants", icon: "terminal", query: "code-ai", color: "pink-500" },
+            { name: "Video AI", icon: "videocam", query: "video-ai", color: "orange-500" },
+            { name: "Computer Vision", icon: "visibility", query: "computer-vision", color: "cyan-500" },
+            { name: "NLP & Text", icon: "language", query: "nlp", color: "yellow-500" },
+            { name: "Research & ML", icon: "science", query: "research", color: "teal-500" },
+            { name: "Machine Learning", icon: "model_training", query: "machine-learning", color: "blue-500" },
+            { name: "All AI Tools", icon: "auto_awesome", query: "ai", color: "indigo-500" },
         ];
 
-        // Render category grid
-        function renderCategoryGrid() {
-            const grid = document.getElementById('categoryGrid');
-            grid.innerHTML = CATEGORIES.map((cat, i) => `
-        <div class="glass-strong rounded-2xl p-6 hover-lift cursor-pointer group animate-scale-in"
-             style="animation-delay: ${i * 0.05}s"
-             onclick="loadCategory('${cat.query}', '${cat.name}', '${cat.icon}')">
-            <div class="${cat.gradient} w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-4
-                        group-hover:scale-110 transition-transform shadow-lg">
-                ${cat.icon}
-            </div>
-            <h3 class="text-white font-bold text-lg mb-1 group-hover:text-primary transition">${cat.name}</h3>
-            <p class="text-gray-500 text-sm leading-snug">${cat.desc}</p>
-        </div>
-    `).join('');
+        let currentCategory = CATEGORIES[0];
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 6;
+        const gradientColors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+
+        // ─── Sidebar Rendering ───
+        function renderSidebar() {
+            const html = CATEGORIES.map((cat, i) => `
+                <button onclick="selectCategory(${i})"
+                    class="sidebar-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium
+                    ${i === 0 ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20' : 'hover:bg-slate-800/50 text-slate-300'}">
+                    <span class="material-symbols-outlined text-xl">${cat.icon}</span>
+                    <span>${cat.name}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('sidebarCategories').innerHTML = html;
+            document.getElementById('mobileSidebarCategories').innerHTML = html;
         }
 
-        // Load a category's tools
-        async function loadCategory(query, name, icon) {
-            // Hide grid, show results
-            document.getElementById('categoryGrid').parentElement.querySelector('.mb-12').style.display = 'none';
-            document.getElementById('categoryGrid').style.display = 'none';
-            const resultsSection = document.getElementById('resultsSection');
-            resultsSection.classList.remove('hidden');
+        function selectCategory(index) {
+            currentCategory = CATEGORIES[index];
+            currentPage = 1;
 
-            document.getElementById('resultsTitle').textContent = `${icon} ${name}`;
-            document.getElementById('resultsSubtitle').textContent = 'Loading tools...';
+            // Update sidebar active states (both desktop & mobile)
+            document.querySelectorAll('.sidebar-btn').forEach((btn, i) => {
+                if (i % CATEGORIES.length === index) {
+                    btn.className = 'sidebar-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/20';
+                } else {
+                    btn.className = 'sidebar-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium hover:bg-slate-800/50 text-slate-300';
+                }
+            });
 
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = `
-        <div class="col-span-full text-center py-16">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            <p class="text-gray-400 mt-4">Loading ${name} tools...</p>
-        </div>
-    `;
+            // Update page title
+            document.getElementById('categoryTitle').textContent = currentCategory.name;
+
+            // Close mobile drawer if open
+            document.getElementById('mobileCategoryDrawer').classList.add('hidden');
+
+            loadCurrentCategory();
+        }
+
+        // ─── Load Tools from API ───
+        async function loadCurrentCategory() {
+            const grid = document.getElementById('toolCardsGrid');
+
+            // Show loading skeletons
+            grid.innerHTML = Array(6).fill('').map(() => `
+                <div class="glass-card rounded-xl p-6">
+                    <div class="loading-shimmer w-12 h-12 rounded-xl mb-4"></div>
+                    <div class="loading-shimmer h-6 w-3/4 rounded mb-3"></div>
+                    <div class="loading-shimmer h-4 w-full rounded mb-2"></div>
+                    <div class="loading-shimmer h-4 w-2/3 rounded mb-6"></div>
+                    <div class="loading-shimmer h-10 w-full rounded-lg"></div>
+                </div>
+            `).join('');
 
             try {
-                const response = await fetch(`${API_URL}/api/rankings?query=${encodeURIComponent(query)}&limit=30`);
+                const response = await fetch(`${API_URL}/api/rankings?query=${encodeURIComponent(currentCategory.query)}&limit=30`);
                 const data = await response.json();
 
                 if (data.success && data.data.length > 0) {
-                    document.getElementById('resultsSubtitle').textContent = `${data.data.length} tools found`;
+                    const tools = data.data;
+                    const totalPages = Math.ceil(tools.length / ITEMS_PER_PAGE);
+                    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+                    const pageTools = tools.slice(start, start + ITEMS_PER_PAGE);
 
-                    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+                    document.getElementById('categorySubtitle').textContent =
+                        `Discover ${tools.length} high-performance AI tools and research papers.`;
 
-                    container.innerHTML = data.data.map((tool, idx) => {
-                        const color = colors[idx % colors.length];
-                        const score = (tool.BoostedScore * 10).toFixed(1);
-                        return `
-                <div class="glass-strong rounded-2xl overflow-hidden hover-lift cursor-pointer group animate-slide-up"
-                     style="animation-delay: ${idx * 0.03}s"
-                     onclick="window.open('${tool.url}', '_blank')">
-                    
-                    <!-- Score badge -->
-                    <div class="relative p-5 pb-3">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-lg"
-                                     style="background: linear-gradient(135deg, ${color}, ${color}88);">
-                                    ${tool.name.substring(0, 1).toUpperCase()}
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-lg group-hover:text-primary transition">${tool.name}</h3>
-                                    <p class="text-gray-500 text-xs">${tool.full_name}</p>
-                                </div>
-                            </div>
-                            <div class="glass px-3 py-1 rounded-full flex items-center gap-1">
-                                <span class="material-icons text-yellow-400 text-sm">star</span>
-                                <span class="text-white font-bold text-sm">${score}</span>
-                            </div>
+                    renderToolCards(pageTools);
+                    renderPagination(totalPages, tools.length);
+                } else {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-20">
+                            <span class="material-symbols-outlined text-6xl text-slate-600 mb-4 block">search_off</span>
+                            <p class="text-slate-400 text-lg font-semibold">No tools found in this category yet.</p>
+                            <p class="text-slate-500 text-sm mt-2">Try a different category or check back later.</p>
                         </div>
+                    `;
+                    document.getElementById('paginationContainer').innerHTML = '';
+                    document.getElementById('categorySubtitle').textContent = 'No tools found';
+                }
+            } catch (error) {
+                console.error('Failed to load tools:', error);
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-20">
+                        <span class="material-symbols-outlined text-6xl text-slate-600 mb-4 block">cloud_off</span>
+                        <p class="text-slate-400 text-lg font-semibold">Unable to load tools.</p>
+                        <p class="text-slate-500 text-sm mt-2 mb-6">Backend may be waking up — try again in a moment.</p>
+                        <button onclick="loadCurrentCategory()"
+                            class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all hover:scale-105">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+                document.getElementById('paginationContainer').innerHTML = '';
+            }
+        }
+
+        // ─── Render Tool Cards ───
+        function renderToolCards(tools) {
+            const grid = document.getElementById('toolCardsGrid');
+
+            grid.innerHTML = tools.map((tool, idx) => {
+                const color = gradientColors[idx % gradientColors.length];
+                const score = (tool.BoostedScore * 10).toFixed(1);
+                const initial = tool.name.substring(0, 1).toUpperCase();
+                const stars = (tool.stars || 0).toLocaleString();
+                const forks = (tool.forks || 0).toLocaleString();
+                const description = (tool.description || 'No description available.').substring(0, 120);
+                const hasMore = (tool.description || '').length > 120;
+
+                return `
+                <div class="glass-card rounded-xl p-6 relative flex flex-col group animate-card"
+                     style="animation-delay: ${idx * 0.08}s">
+                    <!-- Source badge -->
+                    <div class="absolute top-4 right-4 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-700 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm text-slate-400">code</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">${tool.language || 'AI'}</span>
                     </div>
 
-                    <!-- Description -->
-                    <div class="px-5 pb-3">
-                        <p class="text-gray-400 text-sm line-clamp-2 leading-relaxed">
-                            ${(tool.description || 'No description').substring(0, 120)}${(tool.description || '').length > 120 ? '...' : ''}
+                    <div class="mb-4">
+                        <!-- Icon -->
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white mb-4 shadow-lg"
+                             style="background: linear-gradient(135deg, ${color}, ${color}88);">
+                            ${initial}
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition">${tool.name}</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed line-clamp-2">
+                            ${description}${hasMore ? '...' : ''}
                         </p>
                     </div>
 
                     <!-- Stats -->
-                    <div class="px-5 pb-3 flex items-center gap-4 text-xs text-gray-500">
-                        <span class="flex items-center gap-1">
-                            <span class="material-icons" style="font-size:14px">star</span>
-                            ${(tool.stars || 0).toLocaleString()}
-                        </span>
-                        <span class="flex items-center gap-1">
-                            <span class="material-icons" style="font-size:14px">call_split</span>
-                            ${(tool.forks || 0).toLocaleString()}
-                        </span>
-                        ${tool.language ? `<span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full" style="background:${color}"></div>${tool.language}</span>` : ''}
-                        ${tool.IsBoosted ? '<span class="text-yellow-400 font-semibold">🚀 Rising</span>' : ''}
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-yellow-500 text-sm">star</span>
+                            <span class="text-sm font-bold text-slate-200">${stars}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-primary text-sm">fork_right</span>
+                            <span class="text-sm font-bold text-slate-200">${forks}</span>
+                        </div>
+                        ${tool.IsBoosted ? `
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs">🚀</span>
+                            <span class="text-xs font-bold text-yellow-400">Rising</span>
+                        </div>` : ''}
                     </div>
 
                     <!-- Topics -->
                     ${tool.topics && tool.topics.length > 0 ? `
-                    <div class="px-5 pb-3 flex flex-wrap gap-1.5">
-                        ${tool.topics.slice(0, 4).map(t => `<span class="px-2 py-0.5 rounded text-xs bg-white/5 text-gray-400">${t}</span>`).join('')}
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        ${tool.topics.slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-slate-400 uppercase">${t}</span>`).join('')}
                     </div>` : ''}
 
                     <!-- Actions -->
-                    <div class="px-5 pb-5 flex gap-3">
-                        <button onclick="event.stopPropagation(); window.open('${tool.url}', '_blank')"
-                                class="flex-1 py-2.5 glass rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/10 transition flex items-center justify-center gap-2">
-                            <span class="material-icons text-sm">code</span> View Code
+                    <div class="mt-auto flex gap-3">
+                        <button onclick="window.open('${tool.url}', '_blank')"
+                            class="flex-1 bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/40 text-white font-bold py-2.5 rounded-lg text-sm transition-all hover:scale-[1.02]">
+                            View Source
                         </button>
-                        <button onclick="event.stopPropagation(); window.location.href='tool.html?tool=${encodeURIComponent(tool.full_name)}'"
-                                class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white transition flex items-center justify-center gap-2"
-                                style="background: linear-gradient(135deg, ${color}, ${color}88);">
-                            <span class="material-icons text-sm">open_in_new</span> Details
+                        <button onclick="window.location.href='tool.html?tool=${encodeURIComponent(tool.full_name)}'"
+                            class="px-3 border border-slate-700 hover:border-primary hover:bg-primary/10 text-slate-300 hover:text-primary rounded-lg transition-all"
+                            title="View Details">
+                            <span class="material-symbols-outlined text-lg align-middle">open_in_new</span>
                         </button>
                     </div>
                 </div>
                 `;
-                    }).join('');
-                } else {
-                    container.innerHTML = `
-                <div class="col-span-full text-center py-16">
-                    <span class="text-6xl block mb-4">🔍</span>
-                    <p class="text-gray-400 text-lg">No tools found in this category yet.</p>
-                    <p class="text-gray-500 text-sm mt-2">Try a different category or check back later.</p>
-                </div>
-            `;
-                    document.getElementById('resultsSubtitle').textContent = 'No tools found';
-                }
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `
-            <div class="col-span-full text-center py-16">
-                <span class="text-6xl block mb-4">⚠️</span>
-                <p class="text-gray-400 text-lg">Unable to load tools. Backend may be waking up.</p>
-                <button onclick="loadCategory('${query}', '${name}', '${icon}')" 
-                        class="mt-4 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/80 transition">
-                    Try Again
-                </button>
-            </div>
-        `;
+            }).join('');
+        }
+
+        // ─── Pagination ───
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
             }
 
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            let pagesHtml = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    pagesHtml += `<button class="w-10 h-10 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-lg shadow-primary/20">${i}</button>`;
+                } else if (i <= 3 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+                    pagesHtml += `<button onclick="goToPage(${i})" class="w-10 h-10 rounded-lg hover:bg-slate-800 text-slate-400 font-bold transition-colors">${i}</button>`;
+                } else if (i === 4 && currentPage < 4) {
+                    pagesHtml += `<span class="text-slate-600">...</span>`;
+                } else if (i === totalPages - 1 && currentPage > totalPages - 3) {
+                    pagesHtml += `<span class="text-slate-600">...</span>`;
+                }
+            }
+
+            container.innerHTML = `
+                <button onclick="goToPage(${Math.max(1, currentPage - 1)})"
+                    class="p-2 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors ${currentPage === 1 ? 'opacity-40 pointer-events-none' : ''}">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    ${pagesHtml}
+                </div>
+                <button onclick="goToPage(${Math.min(totalPages, currentPage + 1)})"
+                    class="p-2 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors ${currentPage === totalPages ? 'opacity-40 pointer-events-none' : ''}">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            `;
         }
 
-        function showAllCategories() {
-            document.getElementById('categoryGrid').parentElement.querySelector('.mb-12').style.display = '';
-            document.getElementById('categoryGrid').style.display = '';
-            document.getElementById('resultsSection').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function goToPage(page) {
+            currentPage = page;
+            loadCurrentCategory();
+            // Scroll to top of main content
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Check URL params for direct category link
+        // ─── Mobile Drawer ───
+        function toggleMobileDrawer() {
+            document.getElementById('mobileCategoryDrawer').classList.toggle('hidden');
+        }
+
+        // ─── URL Parameters ───
         function checkUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const cat = params.get('cat');
             if (cat) {
-                const found = CATEGORIES.find(c => c.query === cat);
-                if (found) {
-                    loadCategory(found.query, found.name, found.icon);
+                const idx = CATEGORIES.findIndex(c => c.query === cat);
+                if (idx !== -1) {
+                    selectCategory(idx);
+                    return;
                 }
             }
         }
 
-        // Initialize
-        renderCategoryGrid();
+        // ─── Initialize ───
+        renderSidebar();
         checkUrlParams();
+        loadCurrentCategory();
     </script>
 
 </body>
