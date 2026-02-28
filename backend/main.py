@@ -3,7 +3,7 @@ import os
 import threading
 import time
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -15,7 +15,9 @@ from scoring import AIToolScorer
 from cache_manager import cache
 from database import (
     save_feedback, get_all_feedback, delete_feedback,
-    save_tool_suggestion, get_all_suggestions, delete_suggestion
+    save_tool_suggestion, get_all_suggestions, delete_suggestion,
+    record_page_view, get_page_view_analytics, get_page_view_summary,
+    get_feedback_analytics
 )
 
 load_dotenv()
@@ -479,6 +481,55 @@ def clear_cache_endpoint():
     """Clear all cache"""
     cache.clear()
     return {"success": True, "message": "Cache cleared"}
+
+
+# ─── Analytics Endpoints ───
+
+class PageViewRequest(BaseModel):
+    page: str
+    referrer: Optional[str] = ""
+
+
+@app.post("/api/analytics/track")
+async def track_page_view(payload: PageViewRequest, request: Request):
+    """Record a page view — public, no auth needed."""
+    try:
+        user_agent = request.headers.get('user-agent', '') if request else ''
+        record_page_view(
+            page=payload.page,
+            referrer=payload.referrer or "",
+            user_agent=user_agent
+        )
+        return {"success": True}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+
+@app.get("/api/analytics")
+def get_analytics(period: str = "daily", admin_key: str = Query("")):
+    """Get page view analytics — admin only."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    data = get_page_view_analytics(period=period)
+    return {"success": True, "data": data}
+
+
+@app.get("/api/analytics/summary")
+def get_analytics_summary(admin_key: str = Query("")):
+    """Get quick analytics summary — admin only."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    summary = get_page_view_summary()
+    return {"success": True, "data": summary}
+
+
+@app.get("/api/analytics/feedback")
+def get_analytics_feedback(admin_key: str = Query("")):
+    """Get feedback analytics breakdown — admin only."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    data = get_feedback_analytics()
+    return {"success": True, "data": data}
 
 
 if __name__ == "__main__":

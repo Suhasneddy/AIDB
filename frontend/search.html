@@ -327,6 +327,13 @@
         // Auto-focus search input
         document.getElementById('searchInput').focus();
     </script>
+    <!-- Analytics Tracking -->
+    <script>
+        fetch('https://ai-discovery.onrender.com/api/analytics/track', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: 'search', referrer: document.referrer })
+        }).catch(() => { });
+    </script>
 </body>
 
 </html>

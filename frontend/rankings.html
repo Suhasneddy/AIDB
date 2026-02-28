@@ -113,7 +113,7 @@
                 <a href="index.html" class="flex items-center gap-3 group">
                     <div
                         class="size-9 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-2xl">rocket_launch</span>
+                        <span class="material-symbols-outlined text-2xl"></span>
                     </div>
                     <h1 class="text-xl font-extrabold tracking-tight text-white">AI<span
                             class="text-primary font-black ml-1">Discovery</span></h1>
@@ -550,6 +550,13 @@
 
         // ─── Start ───
         init();
+    </script>
+    <!-- Analytics Tracking -->
+    <script>
+        fetch('https://ai-discovery.onrender.com/api/analytics/track', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: 'rankings', referrer: document.referrer })
+        }).catch(() => { });
     </script>
 </body>
 

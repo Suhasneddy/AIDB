@@ -1,7 +1,7 @@
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -200,6 +200,175 @@ def search_tools(query, limit=20):
     except Exception as e:
         print(f"❌ Error searching tools: {e}")
         return []
+
+# ─── Analytics / Page View Tracking ───
+
+def record_page_view(page, referrer="", user_agent=""):
+    """Record a single page view in the page_views table."""
+    try:
+        record = {
+            "page": page,
+            "referrer": referrer or "",
+            "user_agent": user_agent or "",
+            "created_at": datetime.now().isoformat(),
+        }
+        result = supabase.table("page_views").insert(record).execute()
+        return True
+    except Exception as e:
+        print(f"❌ Error recording page view: {e}")
+        return False
+
+
+def get_page_view_analytics(period="daily", days=30):
+    """
+    Get page view analytics aggregated by time period.
+    period: 'daily', 'weekly', or 'monthly'
+    Returns: list of {date, count} dicts
+    """
+    try:
+        # Calculate date range
+        if period == "weekly":
+            since = datetime.now() - timedelta(days=90)
+        elif period == "monthly":
+            since = datetime.now() - timedelta(days=365)
+        else:  # daily
+            since = datetime.now() - timedelta(days=days)
+
+        since_str = since.isoformat()
+
+        # Fetch raw page views within range
+        result = supabase.table("page_views").select(
+            "created_at, page"
+        ).gte("created_at", since_str).order(
+            "created_at", desc=False
+        ).execute()
+
+        rows = result.data or []
+
+        # Aggregate by date
+        date_counts = {}
+        page_counts = {}
+
+        for row in rows:
+            ts = row.get("created_at", "")
+            page = row.get("page", "unknown")
+
+            if not ts:
+                continue
+
+            # Parse date
+            try:
+                dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            except Exception:
+                continue
+
+            if period == "monthly":
+                key = dt.strftime("%Y-%m")
+            elif period == "weekly":
+                # ISO week: Monday start
+                week_start = dt - timedelta(days=dt.weekday())
+                key = week_start.strftime("%Y-%m-%d")
+            else:
+                key = dt.strftime("%Y-%m-%d")
+
+            date_counts[key] = date_counts.get(key, 0) + 1
+            page_counts[page] = page_counts.get(page, 0) + 1
+
+        # Sort and format
+        timeline = [{"date": k, "views": v} for k, v in sorted(date_counts.items())]
+        top_pages = sorted(page_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        return {
+            "timeline": timeline,
+            "top_pages": [{"page": p, "views": v} for p, v in top_pages],
+            "total": sum(date_counts.values()),
+            "period": period,
+        }
+
+    except Exception as e:
+        print(f"❌ Error fetching analytics: {e}")
+        return {"timeline": [], "top_pages": [], "total": 0, "period": period}
+
+
+def get_page_view_summary():
+    """Get quick summary: total views, today's views, this week's views."""
+    try:
+        now = datetime.now()
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+        week_start = (now - timedelta(days=now.weekday())).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ).isoformat()
+
+        # Total views
+        total_res = supabase.table("page_views").select(
+            "id", count="exact"
+        ).execute()
+        total = total_res.count if hasattr(total_res, 'count') and total_res.count else len(total_res.data or [])
+
+        # Today's views
+        today_res = supabase.table("page_views").select(
+            "id", count="exact"
+        ).gte("created_at", today_start).execute()
+        today = today_res.count if hasattr(today_res, 'count') and today_res.count else len(today_res.data or [])
+
+        # This week's views
+        week_res = supabase.table("page_views").select(
+            "id", count="exact"
+        ).gte("created_at", week_start).execute()
+        week = week_res.count if hasattr(week_res, 'count') and week_res.count else len(week_res.data or [])
+
+        return {"total": total, "today": today, "this_week": week}
+
+    except Exception as e:
+        print(f"❌ Error fetching page view summary: {e}")
+        return {"total": 0, "today": 0, "this_week": 0}
+
+
+def get_feedback_analytics():
+    """Get feedback breakdown: by type, by rating, by date."""
+    try:
+        all_feedback = get_all_feedback()
+
+        type_counts = {}
+        rating_counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        daily_counts = {}
+
+        for fb in all_feedback:
+            # Type distribution
+            fb_type = fb.get("feedback_type", "general")
+            type_counts[fb_type] = type_counts.get(fb_type, 0) + 1
+
+            # Rating distribution
+            rating = fb.get("rating", 0)
+            if rating in rating_counts:
+                rating_counts[rating] += 1
+
+            # Daily trend
+            ts = fb.get("created_at", "")
+            if ts:
+                try:
+                    dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                    day_key = dt.strftime("%Y-%m-%d")
+                    daily_counts[day_key] = daily_counts.get(day_key, 0) + 1
+                except Exception:
+                    pass
+
+        total = len(all_feedback)
+        avg_rating = round(
+            sum(fb.get("rating", 0) for fb in all_feedback) / max(total, 1), 1
+        )
+
+        return {
+            "total": total,
+            "average_rating": avg_rating,
+            "by_type": [{"type": k, "count": v} for k, v in type_counts.items()],
+            "by_rating": [{"rating": k, "count": v} for k, v in sorted(rating_counts.items())],
+            "daily_trend": [{"date": k, "count": v} for k, v in sorted(daily_counts.items())],
+        }
+
+    except Exception as e:
+        print(f"❌ Error fetching feedback analytics: {e}")
+        return {"total": 0, "average_rating": 0, "by_type": [], "by_rating": [], "daily_trend": []}
 
 
 # Test the connection
