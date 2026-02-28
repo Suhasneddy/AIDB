@@ -1,14 +1,26 @@
 import asyncio
+import os
 import threading
 import time
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
 import uvicorn
+from dotenv import load_dotenv
 
 from datafetcher import fetch_all_ai_repos, fetch_github_repos
 from scoring import AIToolScorer
 from cache_manager import cache
+from database import (
+    save_feedback, get_all_feedback, delete_feedback,
+    save_tool_suggestion, get_all_suggestions, delete_suggestion
+)
+
+load_dotenv()
+
+ADMIN_KEY = os.getenv("ADMIN_KEY", "admin123")
 
 app = FastAPI(
     title="AI Tool Discovery API",
@@ -156,6 +168,8 @@ def root():
             "/api/categories",
             "/api/tool/{owner/repo}",
             "/api/search?q=keyword",
+            "/api/feedback",
+            "/api/suggest-tool",
             "/api/refresh",
         ]
     }
@@ -321,6 +335,85 @@ def search_tools(q: str = "", limit: int = 20):
         return {"success": False, "message": str(e), "data": []}
 
 
+# ─── Feedback Endpoints ───
+
+class FeedbackRequest(BaseModel):
+    name: str = "Anonymous"
+    email: str = ""
+    rating: int = 5
+    message: str = ""
+    feedback_type: str = "general"
+
+
+@app.post("/api/feedback")
+def submit_feedback(payload: FeedbackRequest):
+    """Submit user feedback — stored in Supabase."""
+    result = save_feedback(payload.dict())
+    if result:
+        return {"success": True, "message": "Thank you for your feedback!", "data": result}
+    return {"success": False, "message": "Failed to save feedback. Please try again."}
+
+
+@app.get("/api/feedback")
+def list_feedback(admin_key: str = Query("")):
+    """List all feedback (admin only)."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    data = get_all_feedback()
+    return {"success": True, "total": len(data), "data": data}
+
+
+@app.delete("/api/feedback/{feedback_id}")
+def remove_feedback(feedback_id: str, admin_key: str = Query("")):
+    """Delete a feedback entry (admin only)."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    ok = delete_feedback(feedback_id)
+    if ok:
+        return {"success": True, "message": "Feedback deleted"}
+    return {"success": False, "message": "Failed to delete feedback"}
+
+
+# ─── Tool Suggestion Endpoints ───
+
+class ToolSuggestionRequest(BaseModel):
+    tool_name: str
+    tool_url: str = ""
+    category: str = ""
+    description: str = ""
+    submitter_name: str = "Anonymous"
+    submitter_email: str = ""
+
+
+@app.post("/api/suggest-tool")
+def submit_tool_suggestion(payload: ToolSuggestionRequest):
+    """Submit a tool suggestion — stored in Supabase."""
+    result = save_tool_suggestion(payload.dict())
+    if result:
+        return {"success": True, "message": "Tool suggestion submitted!", "data": result}
+    return {"success": False, "message": "Failed to save suggestion. Please try again."}
+
+
+@app.get("/api/suggest-tool")
+def list_suggestions(admin_key: str = Query("")):
+    """List all tool suggestions (admin only)."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    data = get_all_suggestions()
+    return {"success": True, "total": len(data), "data": data}
+
+
+@app.delete("/api/suggest-tool/{suggestion_id}")
+def remove_suggestion(suggestion_id: str, admin_key: str = Query("")):
+    """Delete a tool suggestion (admin only)."""
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Invalid admin key")
+    ok = delete_suggestion(suggestion_id)
+    if ok:
+        return {"success": True, "message": "Suggestion deleted"}
+    return {"success": False, "message": "Failed to delete suggestion"}
+
+
 @app.get("/api/refresh")
 def refresh_data():
     """Manually trigger a data refresh (runs in background)"""
@@ -330,7 +423,7 @@ def refresh_data():
 
 
 @app.get("/api/clear-cache")
-def clear_cache():
+def clear_cache_endpoint():
     """Clear all cache"""
     cache.clear()
     return {"success": True, "message": "Cache cleared"}

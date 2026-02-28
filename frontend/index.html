@@ -197,7 +197,7 @@
                             class="h-12 px-8 bg-primary text-white font-bold rounded-lg flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
                             Explore Tools <span class="material-symbols-outlined">chevron_right</span>
                         </a>
-                        <button
+                        <button onclick="openModal('suggestToolModal')"
                             class="h-12 px-8 bg-slate-800 text-slate-100 font-bold rounded-lg border border-slate-700 hover:bg-slate-700 transition-all">
                             Submit a Tool
                         </button>
@@ -332,14 +332,271 @@
                         <h4 class="text-lg font-black text-white mb-2">Want to list your tool?</h4>
                         <p class="text-xs text-slate-400 mb-4">Get featured on our homepage and reach 1M+ professional
                             users monthly.</p>
-                        <button
+                        <button onclick="openModal('suggestToolModal')"
                             class="w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:brightness-110 transition-all">Submit
                             Now</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Stats Counter Bar -->
+        <section class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="text-center p-6 rounded-xl bg-slate-900/40 border border-slate-800">
+                <div class="text-3xl font-black text-primary counter" data-target="1200">0</div>
+                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">AI Tools</p>
+            </div>
+            <div class="text-center p-6 rounded-xl bg-slate-900/40 border border-slate-800">
+                <div class="text-3xl font-black text-emerald-400 counter" data-target="50">0</div>
+                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Categories</p>
+            </div>
+            <div class="text-center p-6 rounded-xl bg-slate-900/40 border border-slate-800">
+                <div class="text-3xl font-black text-violet-400 counter" data-target="10000">0</div>
+                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Users</p>
+            </div>
+            <div class="text-center p-6 rounded-xl bg-slate-900/40 border border-slate-800">
+                <div class="text-3xl font-black text-amber-400">Daily</div>
+                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Updates</p>
+            </div>
+        </section>
+
+        <!-- Engagement & Feedback Hub -->
+        <section class="mt-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-black text-white">Help Us Build Better</h2>
+                <p class="text-slate-400 mt-2">Your input shapes the future of AI Discovery</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Feedback Card -->
+                <div
+                    class="group relative p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-slate-900/50 border border-blue-500/20 hover:border-blue-500/40 transition-all">
+                    <div
+                        class="absolute top-6 right-6 size-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-blue-400 text-2xl">rate_review</span>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-blue-500/30 mb-4 block">feedback</span>
+                    <h3 class="text-xl font-black text-white mb-2">Send Feedback</h3>
+                    <p class="text-sm text-slate-400 mb-6">Report bugs, suggest UI improvements, or share your
+                        experience. Your feedback directly helps us improve.</p>
+                    <button onclick="openModal('feedbackModal')"
+                        class="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">edit_note</span> Give Feedback
+                    </button>
+                </div>
+                <!-- Suggest a Tool Card -->
+                <div
+                    class="group relative p-8 rounded-2xl bg-gradient-to-br from-violet-500/10 to-slate-900/50 border border-violet-500/20 hover:border-violet-500/40 transition-all">
+                    <div
+                        class="absolute top-6 right-6 size-12 rounded-full bg-violet-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-violet-400 text-2xl">lightbulb</span>
+                    </div>
+                    <span class="material-symbols-outlined text-5xl text-violet-500/30 mb-4 block">add_circle</span>
+                    <h3 class="text-xl font-black text-white mb-2">Suggest a Tool</h3>
+                    <p class="text-sm text-slate-400 mb-6">Know an AI tool that's not on our platform? Suggest it and
+                        help grow the community's collection.</p>
+                    <button onclick="openModal('suggestToolModal')"
+                        class="px-6 py-3 bg-violet-500 text-white font-bold rounded-lg hover:bg-violet-600 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">rocket_launch</span> Suggest a Tool
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter / Community -->
+        <section
+            class="mt-16 p-10 rounded-2xl bg-gradient-to-r from-primary/20 via-slate-900/80 to-violet-500/20 border border-primary/20 text-center">
+            <h2 class="text-2xl font-black text-white mb-2">Stay Ahead of the Curve</h2>
+            <p class="text-slate-400 mb-6 max-w-lg mx-auto">Get weekly updates on trending AI tools, new launches, and
+                community picks delivered to your inbox.</p>
+            <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input type="email" placeholder="your@email.com"
+                    class="flex-1 h-12 px-4 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                <button
+                    class="h-12 px-6 bg-primary text-white font-bold rounded-lg hover:brightness-110 transition-all whitespace-nowrap">Subscribe</button>
+            </div>
+        </section>
+
     </main>
+
+    <!-- ═══ FEEDBACK MODAL ═══ -->
+    <div id="feedbackModal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        style="display:none;">
+        <div class="bg-slate-900 border border-primary/30 rounded-2xl w-full max-w-lg p-8 relative shadow-2xl">
+            <button onclick="closeModal('feedbackModal')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <h3 class="text-2xl font-black text-white mb-1">Send Feedback</h3>
+            <p class="text-sm text-slate-400 mb-6">Help us improve AI Discovery</p>
+            <form id="feedbackForm" onsubmit="submitFeedback(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input name="name" placeholder="Your Name"
+                        class="h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                    <input name="email" type="email" placeholder="Email (optional)"
+                        class="h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                </div>
+                <!-- Star Rating -->
+                <div>
+                    <label class="text-xs font-bold text-slate-300 mb-2 block">Rating</label>
+                    <div class="flex gap-1" id="starRating">
+                        <button type="button" onclick="setRating(1)"
+                            class="star-btn text-3xl text-slate-600 hover:text-yellow-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(2)"
+                            class="star-btn text-3xl text-slate-600 hover:text-yellow-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(3)"
+                            class="star-btn text-3xl text-slate-600 hover:text-yellow-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(4)"
+                            class="star-btn text-3xl text-slate-600 hover:text-yellow-400 transition-colors">★</button>
+                        <button type="button" onclick="setRating(5)"
+                            class="star-btn text-3xl text-slate-600 hover:text-yellow-400 transition-colors">★</button>
+                    </div>
+                    <input type="hidden" name="rating" id="ratingValue" value="5" />
+                </div>
+                <!-- Type -->
+                <div class="flex gap-3 flex-wrap">
+                    <label
+                        class="flex items-center gap-2 px-3 py-2 bg-slate-800 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                        <input type="radio" name="feedback_type" value="bug" class="accent-primary" /> <span
+                            class="text-sm text-slate-300">Bug</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 px-3 py-2 bg-slate-800 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                        <input type="radio" name="feedback_type" value="ui" class="accent-primary" /> <span
+                            class="text-sm text-slate-300">UI Improvement</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 px-3 py-2 bg-slate-800 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                        <input type="radio" name="feedback_type" value="feature" class="accent-primary" checked /> <span
+                            class="text-sm text-slate-300">Feature</span>
+                    </label>
+                </div>
+                <textarea name="message" rows="3" placeholder="Tell us what's on your mind..."
+                    class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary resize-none"></textarea>
+                <button type="submit" id="feedbackSubmitBtn"
+                    class="w-full h-12 bg-primary text-white font-bold rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">send</span> Submit Feedback
+                </button>
+            </form>
+            <div id="feedbackSuccess" class="hidden text-center py-8">
+                <span class="material-symbols-outlined text-5xl text-emerald-400 mb-4 block">check_circle</span>
+                <h4 class="text-xl font-bold text-white">Thank you!</h4>
+                <p class="text-slate-400 text-sm mt-1">Your feedback has been received.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SUGGEST TOOL MODAL ═══ -->
+    <div id="suggestToolModal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        style="display:none;">
+        <div
+            class="bg-slate-900 border border-primary/30 rounded-2xl w-full max-w-lg p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('suggestToolModal')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <h3 class="text-2xl font-black text-white mb-1">Submit an AI Tool</h3>
+            <p class="text-sm text-slate-400 mb-6">Know a great tool? Help the community discover it.</p>
+            <form id="suggestForm" onsubmit="submitSuggestion(event)" class="space-y-4">
+                <input name="tool_name" required placeholder="Tool Name *"
+                    class="w-full h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                <input name="tool_url" placeholder="Tool URL (GitHub, website, etc.)"
+                    class="w-full h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                <select name="category"
+                    class="w-full h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:ring-primary focus:border-primary">
+                    <option value="">Select Category</option>
+                    <option value="llm">LLMs</option>
+                    <option value="image-generation">Image Generation</option>
+                    <option value="video-ai">Video AI</option>
+                    <option value="audio-ai">Audio AI</option>
+                    <option value="code-ai">Code AI</option>
+                    <option value="nlp">NLP</option>
+                    <option value="computer-vision">Computer Vision</option>
+                    <option value="machine-learning">Machine Learning</option>
+                    <option value="research">Research</option>
+                    <option value="other">Other</option>
+                </select>
+                <textarea name="description" rows="3" placeholder="Brief description — what does this tool do?"
+                    class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary resize-none"></textarea>
+                <div class="grid grid-cols-2 gap-4">
+                    <input name="submitter_name" placeholder="Your Name"
+                        class="h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                    <input name="submitter_email" type="email" placeholder="Your Email"
+                        class="h-11 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder:text-slate-500 focus:ring-primary focus:border-primary" />
+                </div>
+                <button type="submit" id="suggestSubmitBtn"
+                    class="w-full h-12 bg-violet-500 text-white font-bold rounded-lg hover:bg-violet-600 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">publish</span> Submit Tool
+                </button>
+            </form>
+            <div id="suggestSuccess" class="hidden text-center py-8">
+                <span class="material-symbols-outlined text-5xl text-emerald-400 mb-4 block">check_circle</span>
+                <h4 class="text-xl font-bold text-white">Tool Submitted!</h4>
+                <p class="text-slate-400 text-sm mt-1">We'll review and add it to the directory soon.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="border-t border-slate-800 mt-0 bg-slate-950/50">
+        <div class="max-w-[1440px] mx-auto px-6 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+                <div>
+                    <a href="index.html" class="flex items-center gap-2 mb-4">
+                        <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined text-xl">rocket_launch</span>
+                        </div>
+                        <span class="text-lg font-extrabold text-white">AI<span
+                                class="text-primary ml-0.5">Discovery</span></span>
+                    </a>
+                    <p class="text-xs text-slate-500 leading-relaxed">The world's largest AI tool directory. Discover,
+                        compare, and stay ahead.</p>
+                </div>
+                <div>
+                    <h5 class="text-sm font-bold text-slate-300 mb-4">Explore</h5>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="categories.html" class="hover:text-white transition-colors">Categories</a></li>
+                        <li><a href="rankings.html" class="hover:text-white transition-colors">Rankings</a></li>
+                        <li><a href="compare.html" class="hover:text-white transition-colors">Compare Tools</a></li>
+                        <li><a href="search.html" class="hover:text-white transition-colors">Search</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-sm font-bold text-slate-300 mb-4">Community</h5>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="#" onclick="openModal('suggestToolModal');return false;"
+                                class="hover:text-white transition-colors">Submit a Tool</a></li>
+                        <li><a href="#" onclick="openModal('feedbackModal');return false;"
+                                class="hover:text-white transition-colors">Give Feedback</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-sm font-bold text-slate-300 mb-4">Legal</h5>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-slate-800/50 gap-4">
+                <p class="text-xs text-slate-600">&copy; 2026 AI Discovery. All rights reserved.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-slate-600 hover:text-white transition-colors"><svg class="w-5 h-5"
+                            fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                        </svg></a>
+                    <a href="#" class="text-slate-600 hover:text-white transition-colors"><svg class="w-5 h-5"
+                            fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg></a>
+                </div>
+                <!-- Admin Access — subtle link -->
+                <a href="admin.html"
+                    class="text-[10px] text-slate-700 hover:text-slate-400 transition-colors font-medium">Admin</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- Floating Bottom Navigation (Hidden by default, shows on scroll) -->
     <footer id="floatingNav"
@@ -591,11 +848,120 @@
             if (query) window.location.href = `search.html?q=${encodeURIComponent(query)}`;
         }
 
+        // ─── Modal Helpers ───
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.style.display = 'flex';
+            el.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.style.display = 'none';
+            el.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        // Close modals on backdrop click
+        document.querySelectorAll('[id$="Modal"]').forEach(modal => {
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
+        });
+
+        // ─── Star Rating ───
+        let currentRating = 5;
+        function setRating(n) {
+            currentRating = n;
+            document.getElementById('ratingValue').value = n;
+            document.querySelectorAll('.star-btn').forEach((btn, i) => {
+                btn.style.color = i < n ? '#facc15' : '#475569';
+            });
+        }
+
+        // ─── Submit Feedback ───
+        async function submitFeedback(e) {
+            e.preventDefault();
+            const form = document.getElementById('feedbackForm');
+            const btn = document.getElementById('feedbackSubmitBtn');
+            const fd = new FormData(form);
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Sending...';
+            try {
+                const res = await fetch(`${API_URL}/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: fd.get('name') || 'Anonymous',
+                        email: fd.get('email') || '',
+                        rating: parseInt(fd.get('rating') || '5'),
+                        message: fd.get('message') || '',
+                        feedback_type: fd.get('feedback_type') || 'feature'
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    form.classList.add('hidden');
+                    document.getElementById('feedbackSuccess').classList.remove('hidden');
+                    setTimeout(() => { closeModal('feedbackModal'); form.reset(); form.classList.remove('hidden'); document.getElementById('feedbackSuccess').classList.add('hidden'); setRating(5); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> Submit Feedback'; }, 2500);
+                } else { alert('Failed to submit. Try again.'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> Submit Feedback'; }
+            } catch (err) { console.error(err); alert('Network error. Please try again.'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> Submit Feedback'; }
+        }
+
+        // ─── Submit Tool Suggestion ───
+        async function submitSuggestion(e) {
+            e.preventDefault();
+            const form = document.getElementById('suggestForm');
+            const btn = document.getElementById('suggestSubmitBtn');
+            const fd = new FormData(form);
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Submitting...';
+            try {
+                const res = await fetch(`${API_URL}/api/suggest-tool`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tool_name: fd.get('tool_name') || '',
+                        tool_url: fd.get('tool_url') || '',
+                        category: fd.get('category') || '',
+                        description: fd.get('description') || '',
+                        submitter_name: fd.get('submitter_name') || 'Anonymous',
+                        submitter_email: fd.get('submitter_email') || ''
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    form.classList.add('hidden');
+                    document.getElementById('suggestSuccess').classList.remove('hidden');
+                    setTimeout(() => { closeModal('suggestToolModal'); form.reset(); form.classList.remove('hidden'); document.getElementById('suggestSuccess').classList.add('hidden'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">publish</span> Submit Tool'; }, 2500);
+                } else { alert('Failed to submit. Try again.'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">publish</span> Submit Tool'; }
+            } catch (err) { console.error(err); alert('Network error. Please try again.'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">publish</span> Submit Tool'; }
+        }
+
+        // ─── Animated Counters ───
+        function animateCounters() {
+            document.querySelectorAll('.counter').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                if (!target || el.dataset.done) return;
+                el.dataset.done = '1';
+                let current = 0;
+                const step = target / 60;
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    el.textContent = Math.floor(current).toLocaleString() + '+';
+                }, 20);
+            });
+        }
+        // Trigger counters when they scroll into view
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) animateCounters(); });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el));
+
         // ─── Initialize ───
         renderCategoryRibbon();
         loadTrending();
         loadTop10();
         setupFloatingNav();
+        setRating(5);
     </script>
 
 </body>

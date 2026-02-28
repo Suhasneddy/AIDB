@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Panel - AI Discovery</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class", theme: {
+                extend: {
+                    colors: { primary: "#4b77de", "background-dark": "#121620" },
+                    fontFamily: { display: ["Montserrat"] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #111621;
+        }
+
+        .tab-active {
+            background: #4b77de;
+            color: white;
+        }
+
+        .tab-inactive {
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .tab-inactive:hover {
+            color: white;
+            background: rgba(75, 119, 222, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-[#111621] text-slate-100 font-display min-h-screen">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <a href="index.html" class="inline-flex items-center gap-2 mb-6">
+                    <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-2xl">rocket_launch</span>
+                    </div>
+                    <span class="text-2xl font-extrabold text-white">AI<span
+                            class="text-primary ml-1">Discovery</span></span>
+                </a>
+                <h2 class="text-2xl font-black text-white">Admin Panel</h2>
+                <p class="text-sm text-slate-400 mt-1">Enter your admin key to continue</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+                <input id="adminKeyInput" type="password" placeholder="Admin Key"
+                    class="w-full h-12 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:ring-primary focus:border-primary mb-4"
+                    onkeypress="if(event.key==='Enter') attemptLogin()" />
+                <button onclick="attemptLogin()"
+                    class="w-full h-12 bg-primary text-white font-bold rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">lock_open</span> Sign In
+                </button>
+                <p id="loginError" class="text-red-400 text-sm text-center mt-4 hidden">Invalid admin key. Try again.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard (hidden until login) -->
+    <div id="dashboard" class="hidden">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-[#111621]/90 backdrop-blur-xl border-b border-primary/20 px-6 py-3">
+            <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined text-lg">rocket_launch</span>
+                        </div>
+                        <span class="text-lg font-extrabold text-white">AI<span
+                                class="text-primary ml-0.5">Discovery</span></span>
+                    </a>
+                    <span
+                        class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold uppercase">Admin</span>
+                </div>
+                <button onclick="logout()"
+                    class="px-4 py-2 text-sm text-slate-400 hover:text-white border border-slate-700 rounded-lg hover:bg-slate-800 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">logout</span> Logout
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-[1400px] mx-auto px-6 py-8">
+            <!-- Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><span
+                                class="material-symbols-outlined text-blue-400">rate_review</span></div>
+                        <div>
+                            <p class="text-2xl font-black text-white" id="feedbackCount">--</p>
+                            <p class="text-xs text-slate-400">Total Feedback</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-lg bg-violet-500/20 flex items-center justify-center"><span
+                                class="material-symbols-outlined text-violet-400">lightbulb</span></div>
+                        <div>
+                            <p class="text-2xl font-black text-white" id="suggestCount">--</p>
+                            <p class="text-xs text-slate-400">Tool Suggestions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-lg bg-emerald-500/20 flex items-center justify-center"><span
+                                class="material-symbols-outlined text-emerald-400">database</span></div>
+                        <div>
+                            <p class="text-2xl font-black text-white">Active</p>
+                            <p class="text-xs text-slate-400">Backend Status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-800 pb-4">
+                <button onclick="switchTab('feedback')" id="tabFeedback"
+                    class="tab-active px-5 py-2 rounded-lg text-sm font-bold transition-all">Feedback</button>
+                <button onclick="switchTab('suggestions')" id="tabSuggestions"
+                    class="tab-inactive px-5 py-2 rounded-lg text-sm font-bold transition-all">Tool Suggestions</button>
+                <div class="flex-1"></div>
+                <button onclick="exportToExcel()"
+                    class="px-4 py-2 text-sm font-semibold text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/10 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">download</span> Export Excel
+                </button>
+                <button onclick="refreshData()"
+                    class="px-4 py-2 text-sm font-semibold text-primary border border-primary/30 rounded-lg hover:bg-primary/10 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">refresh</span> Refresh
+                </button>
+            </div>
+
+            <!-- Feedback Table -->
+            <div id="feedbackPanel">
+                <div class="bg-slate-900/30 border border-slate-800 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-900/50 text-xs text-slate-400 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Name</th>
+                                    <th class="px-4 py-3">Email</th>
+                                    <th class="px-4 py-3">Rating</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3">Message</th>
+                                    <th class="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTableBody" class="divide-y divide-slate-800/50">
+                                <tr>
+                                    <td colspan="7" class="px-4 py-12 text-center text-slate-500">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestions Table -->
+            <div id="suggestionsPanel" class="hidden">
+                <div class="bg-slate-900/30 border border-slate-800 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-900/50 text-xs text-slate-400 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Tool Name</th>
+                                    <th class="px-4 py-3">URL</th>
+                                    <th class="px-4 py-3">Category</th>
+                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3">Submitter</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suggestTableBody" class="divide-y divide-slate-800/50">
+                                <tr>
+                                    <td colspan="8" class="px-4 py-12 text-center text-slate-500">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'https://ai-discovery.onrender.com';
+        let adminKey = sessionStorage.getItem('admin_key') || '';
+        let currentTab = 'feedback';
+        let feedbackData = [];
+        let suggestionsData = [];
+
+        // Auto-login if key stored
+        if (adminKey) { showDashboard(); }
+
+        function attemptLogin() {
+            adminKey = document.getElementById('adminKeyInput').value;
+            if (!adminKey) return;
+            // Verify by trying to fetch feedback
+            fetch(`${API_URL}/api/feedback?admin_key=${encodeURIComponent(adminKey)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success !== undefined && !data.detail) {
+                        sessionStorage.setItem('admin_key', adminKey);
+                        showDashboard();
+                    } else {
+                        document.getElementById('loginError').classList.remove('hidden');
+                    }
+                })
+                .catch(() => {
+                    // If backend is down, still allow login to try
+                    sessionStorage.setItem('admin_key', adminKey);
+                    showDashboard();
+                });
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            refreshData();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('admin_key');
+            adminKey = '';
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('adminKeyInput').value = '';
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabFeedback').className = tab === 'feedback' ? 'tab-active px-5 py-2 rounded-lg text-sm font-bold transition-all' : 'tab-inactive px-5 py-2 rounded-lg text-sm font-bold transition-all';
+            document.getElementById('tabSuggestions').className = tab === 'suggestions' ? 'tab-active px-5 py-2 rounded-lg text-sm font-bold transition-all' : 'tab-inactive px-5 py-2 rounded-lg text-sm font-bold transition-all';
+            document.getElementById('feedbackPanel').classList.toggle('hidden', tab !== 'feedback');
+            document.getElementById('suggestionsPanel').classList.toggle('hidden', tab !== 'suggestions');
+        }
+
+        async function refreshData() {
+            await Promise.all([loadFeedback(), loadSuggestions()]);
+        }
+
+        async function loadFeedback() {
+            try {
+                const res = await fetch(`${API_URL}/api/feedback?admin_key=${encodeURIComponent(adminKey)}`);
+                const data = await res.json();
+                if (data.success) {
+                    feedbackData = data.data;
+                    document.getElementById('feedbackCount').textContent = data.total;
+                    renderFeedbackTable(data.data);
+                } else {
+                    document.getElementById('feedbackTableBody').innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-red-400">Access denied or error</td></tr>';
+                }
+            } catch (e) {
+                document.getElementById('feedbackTableBody').innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-red-400">Backend unavailable</td></tr>';
+            }
+        }
+
+        async function loadSuggestions() {
+            try {
+                const res = await fetch(`${API_URL}/api/suggest-tool?admin_key=${encodeURIComponent(adminKey)}`);
+                const data = await res.json();
+                if (data.success) {
+                    suggestionsData = data.data;
+                    document.getElementById('suggestCount').textContent = data.total;
+                    renderSuggestTable(data.data);
+                } else {
+                    document.getElementById('suggestTableBody').innerHTML = '<tr><td colspan="8" class="px-4 py-12 text-center text-red-400">Access denied or error</td></tr>';
+                }
+            } catch (e) {
+                document.getElementById('suggestTableBody').innerHTML = '<tr><td colspan="8" class="px-4 py-12 text-center text-red-400">Backend unavailable</td></tr>';
+            }
+        }
+
+        function renderStars(n) {
+            return Array(5).fill('').map((_, i) => `<span style="color:${i < n ? '#facc15' : '#334155'}">★</span>`).join('');
+        }
+
+        function renderFeedbackTable(items) {
+            const tbody = document.getElementById('feedbackTableBody');
+            if (!items.length) { tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-slate-500">No feedback yet</td></tr>'; return; }
+            tbody.innerHTML = items.map(item => `
+                <tr class="hover:bg-slate-800/30 transition-colors">
+                    <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">${new Date(item.created_at).toLocaleDateString()}</td>
+                    <td class="px-4 py-3 text-sm font-semibold text-white">${item.name || 'Anonymous'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${item.email || '-'}</td>
+                    <td class="px-4 py-3 text-sm">${renderStars(item.rating)}</td>
+                    <td class="px-4 py-3"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${item.feedback_type === 'bug' ? 'bg-red-500/20 text-red-400' : item.feedback_type === 'ui' ? 'bg-amber-500/20 text-amber-400' : 'bg-primary/20 text-primary'}">${item.feedback_type || 'general'}</span></td>
+                    <td class="px-4 py-3 text-sm text-slate-300 max-w-xs truncate">${item.message || '-'}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="deleteFeedback('${item.id}')" class="size-8 rounded-lg text-red-400 hover:bg-red-500/10 flex items-center justify-center ml-auto transition-all">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSuggestTable(items) {
+            const tbody = document.getElementById('suggestTableBody');
+            if (!items.length) { tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-12 text-center text-slate-500">No suggestions yet</td></tr>'; return; }
+            tbody.innerHTML = items.map(item => `
+                <tr class="hover:bg-slate-800/30 transition-colors">
+                    <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">${new Date(item.created_at).toLocaleDateString()}</td>
+                    <td class="px-4 py-3 text-sm font-semibold text-white">${item.tool_name}</td>
+                    <td class="px-4 py-3 text-xs"><a href="${item.tool_url}" target="_blank" class="text-primary hover:underline truncate block max-w-[120px]">${item.tool_url || '-'}</a></td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${item.category || '-'}</td>
+                    <td class="px-4 py-3 text-sm text-slate-300 max-w-xs truncate">${item.description || '-'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${item.submitter_name || 'Anonymous'}<br/><span class="text-slate-600">${item.submitter_email || ''}</span></td>
+                    <td class="px-4 py-3"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${item.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' : item.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}">${item.status}</span></td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="deleteSuggestion('${item.id}')" class="size-8 rounded-lg text-red-400 hover:bg-red-500/10 flex items-center justify-center ml-auto transition-all">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteFeedback(id) {
+            if (!confirm('Delete this feedback?')) return;
+            try {
+                await fetch(`${API_URL}/api/feedback/${id}?admin_key=${encodeURIComponent(adminKey)}`, { method: 'DELETE' });
+                loadFeedback();
+            } catch (e) { alert('Failed to delete'); }
+        }
+
+        async function deleteSuggestion(id) {
+            if (!confirm('Delete this suggestion?')) return;
+            try {
+                await fetch(`${API_URL}/api/suggest-tool/${id}?admin_key=${encodeURIComponent(adminKey)}`, { method: 'DELETE' });
+                loadSuggestions();
+            } catch (e) { alert('Failed to delete'); }
+        }
+
+        function exportToExcel() {
+            const data = currentTab === 'feedback' ? feedbackData : suggestionsData;
+            if (!data.length) { alert('No data to export'); return; }
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, currentTab === 'feedback' ? 'Feedback' : 'Suggestions');
+            XLSX.writeFile(wb, `ai_discovery_${currentTab}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        }
+    </script>
+</body>
+
+</html>

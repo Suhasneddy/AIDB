@@ -217,3 +217,89 @@ if __name__ == "__main__":
         print("\n⚠️ Check your .env file:")
         print(f"   SUPABASE_URL: {SUPABASE_URL}")
         print(f"   SUPABASE_KEY: {'Set' if SUPABASE_KEY else 'Not set'}")
+
+
+# ─── Feedback CRUD ───
+
+def save_feedback(data):
+    """Save user feedback to the feedback table."""
+    try:
+        record = {
+            "name": data.get("name", "Anonymous"),
+            "email": data.get("email", ""),
+            "rating": data.get("rating", 5),
+            "message": data.get("message", ""),
+            "feedback_type": data.get("feedback_type", "general"),
+            "created_at": datetime.now().isoformat(),
+        }
+        result = supabase.table("feedback").insert(record).execute()
+        return result.data[0] if result.data else None
+    except Exception as e:
+        print(f"❌ Error saving feedback: {e}")
+        return None
+
+
+def get_all_feedback():
+    """Get all feedback entries (admin)."""
+    try:
+        result = supabase.table("feedback").select("*").order(
+            "created_at", desc=True
+        ).execute()
+        return result.data or []
+    except Exception as e:
+        print(f"❌ Error fetching feedback: {e}")
+        return []
+
+
+def delete_feedback(feedback_id):
+    """Delete a feedback entry by ID."""
+    try:
+        result = supabase.table("feedback").delete().eq("id", feedback_id).execute()
+        return True
+    except Exception as e:
+        print(f"❌ Error deleting feedback: {e}")
+        return False
+
+
+# ─── Tool Suggestion CRUD ───
+
+def save_tool_suggestion(data):
+    """Save a user's AI tool suggestion."""
+    try:
+        record = {
+            "tool_name": data.get("tool_name", ""),
+            "tool_url": data.get("tool_url", ""),
+            "category": data.get("category", ""),
+            "description": data.get("description", ""),
+            "submitter_name": data.get("submitter_name", "Anonymous"),
+            "submitter_email": data.get("submitter_email", ""),
+            "status": "pending",
+            "created_at": datetime.now().isoformat(),
+        }
+        result = supabase.table("tool_suggestions").insert(record).execute()
+        return result.data[0] if result.data else None
+    except Exception as e:
+        print(f"❌ Error saving tool suggestion: {e}")
+        return None
+
+
+def get_all_suggestions():
+    """Get all tool suggestions (admin)."""
+    try:
+        result = supabase.table("tool_suggestions").select("*").order(
+            "created_at", desc=True
+        ).execute()
+        return result.data or []
+    except Exception as e:
+        print(f"❌ Error fetching suggestions: {e}")
+        return []
+
+
+def delete_suggestion(suggestion_id):
+    """Delete a tool suggestion by ID."""
+    try:
+        result = supabase.table("tool_suggestions").delete().eq("id", suggestion_id).execute()
+        return True
+    except Exception as e:
+        print(f"❌ Error deleting suggestion: {e}")
+        return False
