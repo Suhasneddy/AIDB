@@ -10,7 +10,7 @@ repos = [
 ]
 
 print("\n" + "="*60)
-print("ENHANCED ALGORITHM TEST")
+print("BAYESIAN + Z-SCORE ALGORITHM TEST")
 print("="*60 + "\n")
 
 scorer = AIToolScorer()
@@ -19,10 +19,11 @@ ranked = scorer.rank_tools(repos)
 print("\nRESULTS:")
 print("-"*60)
 for idx, row in ranked.iterrows():
-    boost = "[BOOSTED]" if row["IsBoosted"] else ""
+    boost = "[ANOMALY BOOSTED]" if row["IsBoosted"] else ""
+    z_score = row.get("GrowthZScore", 0.0)
     print(f"#{idx}. {row['name']:15} - {row['stars']:>7,} stars")
     print(f"    Score: {row['BoostedScore']:.3f} {boost}")
-    print(f"    Tier: {row['BoostTier']}")
+    print(f"    Tier: {row['BoostTier']} (Z-Score: {z_score:+.2f})")
     print()
 
 print("="*60)
@@ -31,7 +32,9 @@ print(f"  Growth: {scorer.weights['GrowthRate']*100:.0f}%")
 print(f"  Activity: {scorer.weights['Activity']*100:.0f}%")
 print(f"  Community: {scorer.weights['CommunityStrength']*100:.0f}%")
 print(f"  Freshness: {scorer.weights['Freshness']*100:.0f}%")
-print("\nBOOST TIERS:")
+print("\nHYBRID BOOSTER CONFIG:")
+print("  Star-based tiers:")
 for tier in scorer.booster_tiers:
-    print(f"  {tier['name']}: <{tier['star_max']} stars, {tier['growth_min']*100:.0f}%+ growth = +{(tier['boost']-1)*100:.0f}% boost")
+    print(f"    {tier['name']}: <{tier['star_max']} stars, {tier['growth_min']*100:.0f}%+ growth = +{(tier['boost']-1)*100:.0f}% boost")
+print("  Z-Score anomaly: Z >= 1.5 = +25% boost (any size repo)")
 print("="*60)

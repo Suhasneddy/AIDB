@@ -1,6 +1,8 @@
 import asyncio
 import threading
 import time
+import numpy as np
+import pandas as pd
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
@@ -8,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from datafetcher import fetch_all_ai_repos, fetch_github_repos
+from fetchers.huggingface_fetcher import fetch_huggingface_models
 from scoring import AIToolScorer
 from cache_manager import cache
 
@@ -63,16 +66,47 @@ def _preload_data():
     print("=" * 60)
 
     try:
-        # Step 1: Fetch 100 repos in parallel (~5 seconds)
-        repos = fetch_all_ai_repos(target_count=100)
+        # Step 1: Fetch from BOTH GitHub and Hugging Face
+        print("Fetching from GitHub...")
+        github_repos = fetch_all_ai_repos(target_count=100)
+        
+        print("Fetching from Hugging Face...")
+        from fetchers.huggingface_fetcher import fetch_all_categories
+        hf_models = fetch_all_categories(limit_per_category=20)
+        
+        # Combine both sources
+        all_repos = github_repos + hf_models
+        print(f"Total tools: {len(github_repos)} GitHub + {len(hf_models)} HuggingFace = {len(all_repos)}")
 
-        if not repos:
-            print("❌ No repos fetched. Check GITHUB_TOKEN.")
+        if not all_repos:
+            print("❌ No repos fetched. Check tokens.")
             return
 
         # Step 2: Score and rank them
-        ranked_df = scorer.rank_tools(repos)
-        all_results = ranked_df.to_dict("records")
+        ranked_df = scorer.rank_tools(all_repos)
+        
+        # Convert to dict and clean non-serializable types
+        all_results = []
+        for record in ranked_df.to_dict("records"):
+            # Convert datetime objects to strings
+            clean_record = {}
+            for key, value in record.items():
+                if hasattr(value, 'isoformat'):  # datetime object
+                    clean_record[key] = value.isoformat()
+                elif isinstance(value, (np.integer, np.floating)):
+                    clean_record[key] = float(value)
+                elif isinstance(value, np.ndarray):
+                    clean_record[key] = value.tolist()
+                elif value is None or (isinstance(value, float) and np.isnan(value)):
+                    clean_record[key] = None
+                else:
+                    clean_record[key] = value
+            all_results.append(clean_record)
+        
+        # Normalize URLs: HuggingFace uses 'source_url', frontend expects 'url'
+        for tool in all_results:
+            if not tool.get("url") and tool.get("source_url"):
+                tool["url"] = tool["source_url"]
 
         # Step 3: Cache the full dataset
         cache.set("all_tools", all_results)
@@ -118,26 +152,36 @@ def _preload_data():
 
 def _matches_category(tool, category):
     """Check if a tool matches a category based on its topics, name, or language."""
-    topics = [t.lower() for t in tool.get("topics", [])]
-    name = tool.get("name", "").lower()
-    desc = (tool.get("description") or "").lower()
+    try:
+        # Handle both GitHub (topics) and HuggingFace (tags)
+        topics_or_tags = tool.get("topics") or tool.get("tags") or []
+        if not isinstance(topics_or_tags, list):
+            topics_or_tags = []
+        
+        topics = [str(t).lower() for t in topics_or_tags]
+        name = str(tool.get("name", "")).lower()
+        desc = str(tool.get("description") or "").lower()
+        subcategory = str(tool.get("subcategory", "")).lower()  # HF pipeline_tag
 
-    keyword_map = {
-        "ai": ["ai", "artificial-intelligence", "machine-learning", "deep-learning"],
-        "machine-learning": ["machine-learning", "deep-learning", "ml", "neural-network"],
-        "llm": ["llm", "gpt", "language-model", "chatgpt", "transformer", "nlp"],
-        "image-generation": ["stable-diffusion", "image-generation", "dall-e", "diffusion", "text-to-image"],
-        "code-ai": ["code-generation", "copilot", "coding", "code-assistant"],
-        "nlp": ["nlp", "text", "sentiment", "language"],
-        "computer-vision": ["computer-vision", "object-detection", "image-classification", "yolo"],
-        "audio-ai": ["text-to-speech", "tts", "music", "voice", "audio"],
-        "video-ai": ["video-generation", "text-to-video", "video"],
-        "research": ["research", "paper", "benchmark", "dataset"],
-    }
+        keyword_map = {
+            "ai": ["ai", "artificial-intelligence", "machine-learning", "deep-learning"],
+            "machine-learning": ["machine-learning", "deep-learning", "ml", "neural-network", "pytorch", "tensorflow"],
+            "llm": ["llm", "gpt", "language-model", "chatgpt", "transformer", "nlp", "text-generation", "text2text"],
+            "image-generation": ["stable-diffusion", "image-generation", "dall-e", "diffusion", "text-to-image", "image-to-image"],
+            "code-ai": ["code-generation", "copilot", "coding", "code-assistant", "programming"],
+            "nlp": ["nlp", "text", "sentiment", "language", "text-classification", "token-classification", "question-answering", "translation", "summarization"],
+            "computer-vision": ["computer-vision", "object-detection", "image-classification", "yolo", "vision", "image-segmentation"],
+            "audio-ai": ["text-to-speech", "tts", "music", "voice", "audio", "speech-recognition", "automatic-speech-recognition", "audio-classification"],
+            "video-ai": ["video-generation", "text-to-video", "video", "image-to-video"],
+            "research": ["research", "paper", "benchmark", "dataset"],
+        }
 
-    keywords = keyword_map.get(category, [category])
-    search_text = " ".join(topics) + " " + name + " " + desc
-    return any(kw in search_text for kw in keywords)
+        keywords = keyword_map.get(category, [category])
+        search_text = " ".join(topics) + " " + name + " " + desc + " " + subcategory
+        return any(kw in search_text for kw in keywords)
+    except Exception as e:
+        print(f"Error matching category for tool {tool.get('name', 'unknown')}: {e}")
+        return False
 
 
 def _schedule_refresh():
@@ -220,7 +264,9 @@ def get_rankings(query: str = "ai", limit: int = 20):
         }
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"❌ Error in get_rankings: {e}")
+        import traceback
+        traceback.print_exc()
         return {"success": False, "message": str(e), "data": []}
 
 

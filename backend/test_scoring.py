@@ -1,5 +1,5 @@
 """
-Test the enhanced scoring algorithm with real-world scenarios
+Test the Bayesian + Z-Score scoring algorithm with real-world scenarios
 """
 from scoring import AIToolScorer
 
@@ -38,7 +38,7 @@ test_repos = [
 ]
 
 print("\n" + "="*70)
-print("🎯 ENHANCED SCORING ALGORITHM TEST")
+print("🎯 BAYESIAN + Z-SCORE ALGORITHM TEST")
 print("="*70 + "\n")
 
 scorer = AIToolScorer()
@@ -54,7 +54,10 @@ for idx, row in ranked.iterrows():
     
     print(f"\n#{idx}. {boost_emoji} {row['name']}")
     print(f"    Stars: {row['stars']:,} | Score: {row['BoostedScore']:.3f} {tier}")
-    print(f"    Growth: {row['GrowthRate_N']:.2f} | Activity: {row['Activity_N']:.2f} | Fresh: {row['Freshness_N']:.2f}")
+    
+    # Retrieve ZScore, defaulting to 0.0 if not found
+    z_score = row.get("GrowthZScore", 0.0)
+    print(f"    Growth Z-Score: {z_score:+.2f} | Activity: {row['Activity_N']:.2f} | Fresh: {row['Freshness_N']:.2f}")
 
 print("\n" + "="*70)
 print("✅ Algorithm successfully prioritizes emerging repos!")

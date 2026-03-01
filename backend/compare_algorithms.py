@@ -34,15 +34,16 @@ print("-" * 80)
 for idx, row in df_simple.iterrows():
     print(f"#{idx}. {row['name']:15} - {row['stars']:>7,} stars")
 
-# Enhanced algorithm
+# Bayesian + Z-Score algorithm
 scorer = AIToolScorer()
 df_enhanced = scorer.rank_tools(repos)
 
-print("\n🔹 ENHANCED ALGORITHM (Growth-Focused)")
+print("\n🔹 BAYESIAN + Z-SCORE ALGORITHM (Confidence + Anomaly Focus)")
 print("-" * 80)
 for idx, row in df_enhanced.iterrows():
     boost = "🚀" if row["IsBoosted"] else "  "
-    tier = f" [{row['BoostTier']}]" if row["IsBoosted"] else ""
+    z_score = row.get("GrowthZScore", 0.0)
+    tier = f" [{row['BoostTier']} Z:{z_score:+.2f}]" if row["IsBoosted"] else ""
     print(f"#{idx}. {boost} {row['name']:15} - {row['stars']:>7,} stars (Score: {row['BoostedScore']:.3f}){tier}")
 
 print("\n" + "="*80)
