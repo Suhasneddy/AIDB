@@ -70,7 +70,7 @@
             font-size: 0.75rem;
             letter-spacing: 0.05em;
         }
-        
+
         .category-btn.active {
             background: #3E92CC !important;
         }
@@ -101,20 +101,29 @@
         <!-- Tool Selector -->
         <div id="toolSelector" class="hidden mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700">
             <h3 class="text-lg font-bold mb-4">Select Tools to Compare</h3>
-            
+
             <!-- Category Filter -->
             <div class="mb-6">
                 <label class="block text-sm font-semibold mb-3 text-gray-400">Filter by Category</label>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">All</button>
-                    <button onclick="filterCategory('llm')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🤖 LLMs</button>
-                    <button onclick="filterCategory('image-generation')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎨 Image Gen</button>
-                    <button onclick="filterCategory('video-ai')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎬 Video AI</button>
-                    <button onclick="filterCategory('code-ai')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">💻 Code AI</button>
-                    <button onclick="filterCategory('machine-learning')" class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🧠 ML</button>
+                    <button onclick="filterCategory('all')"
+                        class="category-btn active px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">All</button>
+                    <button onclick="filterCategory('llm')"
+                        class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🤖 LLMs</button>
+                    <button onclick="filterCategory('image-generation')"
+                        class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎨 Image
+                        Gen</button>
+                    <button onclick="filterCategory('video-ai')"
+                        class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🎬 Video
+                        AI</button>
+                    <button onclick="filterCategory('code-ai')"
+                        class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">💻 Code
+                        AI</button>
+                    <button onclick="filterCategory('machine-learning')"
+                        class="category-btn px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm">🧠 ML</button>
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="toolList">
                 <!-- Will be populated dynamically -->
             </div>
@@ -152,7 +161,7 @@
     </main>
 
     <script>
-        const API_URL = 'https://ai-discovery.onrender.com';
+        const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
         let selectedTools = [];
         let comparisonTools = [];
         let allAvailableTools = [];
@@ -183,17 +192,17 @@
 
         function filterCategory(category) {
             currentCategory = category;
-            
+
             // Update active button
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active', 'bg-secondary'));
             event.target.classList.add('active', 'bg-secondary');
-            
+
             // Filter tools
             let filtered = allAvailableTools;
             if (category !== 'all') {
                 filtered = allAvailableTools.filter(tool => matchesCategory(tool, category));
             }
-            
+
             // Display filtered tools
             const toolList = document.getElementById('toolList');
             toolList.innerHTML = filtered.slice(0, 20).map((tool, idx) => `
@@ -245,10 +254,10 @@
                 return;
             }
 
-            comparisonTools = selectedTools.map(fullName => 
+            comparisonTools = selectedTools.map(fullName =>
                 allAvailableTools.find(t => t.full_name === fullName)
             ).filter(t => t);
-            
+
             renderComparison();
             closeSelector();
             selectedTools = [];
@@ -436,6 +445,11 @@
             alert('PDF export feature - In a real app, this would generate a PDF report of the comparison');
         }
     </script>
+
+    <!-- Floating Chat Button -->
+    <a href="chatbot.html" title="Ask AI Assistant"
+        style="position:fixed;bottom:24px;right:24px;z-index:999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;box-shadow:0 8px 30px rgba(99,102,241,0.4);transition:transform 0.2s;"
+        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a>
 
 </body>
 

@@ -7,28 +7,36 @@ import pandas as pd
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
 import uvicorn
+import os
 
 from datafetcher import fetch_all_ai_repos, fetch_github_repos
 from fetchers.huggingface_fetcher import fetch_huggingface_models
 from scoring import AIToolScorer
 from cache_manager import cache
+from chatbot import chatbot
+
+# Detect if running on Vercel (serverless) or locally
+IS_SERVERLESS = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan event handler for startup and shutdown"""
     print("Starting AI Tool Discovery API v2.0...")
     
-    # CLEAR OLD CACHE on startup to force fresh data
-    cache.clear()
-    print("Cache cleared - fetching fresh data...")
-    
-    # Start preloading IMMEDIATELY (blocking to ensure fresh data)
-    _preload_data()
-    
-    # Start the periodic refresh scheduler
-    refresh_thread = threading.Thread(target=_schedule_refresh, daemon=True)
-    refresh_thread.start()
+    if IS_SERVERLESS:
+        # Serverless mode: skip startup preloading (use lazy loading instead)
+        print("Running in SERVERLESS mode — data will load on first request")
+    else:
+        # Local mode: preload data and start background refresh
+        cache.clear()
+        print("Cache cleared - fetching fresh data...")
+        _preload_data()
+        
+        refresh_thread = threading.Thread(target=_schedule_refresh, daemon=True)
+        refresh_thread.start()
     
     yield
     # Cleanup on shutdown (if needed)
@@ -207,6 +215,8 @@ def root():
             "/api/categories",
             "/api/tool/{owner/repo}",
             "/api/search?q=keyword",
+            "/api/chat",
+            "/api/chat/suggestions",
             "/api/refresh",
         ]
     }
@@ -244,7 +254,27 @@ def get_rankings(query: str = "ai", limit: int = 20):
                 "data": results
             }
 
-        # If no cache at all (first request before preload finishes), fetch live
+        # If no cache at all — serverless lazy load or first request
+        if IS_SERVERLESS and not _data_ready:
+            print("📡 Serverless lazy load — fetching data on first request...")
+            _preload_data()
+
+            # Try cache again after preload
+            all_tools = cache.get("all_tools")
+            if all_tools:
+                filtered = [t for t in all_tools if _matches_category(t, query)]
+                if not filtered:
+                    filtered = all_tools
+                results = filtered[:limit]
+                return {
+                    "success": True,
+                    "total": len(results),
+                    "query": query,
+                    "from_cache": True,
+                    "data": results
+                }
+
+        # Fallback: fetch live for the specific query
         print(f"📡 Cache miss - fetching live for: {query}")
         repos = fetch_github_repos(query=query, max_results=min(limit, 30))
 
@@ -387,6 +417,54 @@ def clear_cache():
     """Clear all cache"""
     cache.clear()
     return {"success": True, "message": "Cache cleared"}
+
+
+# ─── AI Chatbot Endpoints ────────────────────────────────────────
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+
+@app.post("/api/chat")
+def chat_endpoint(request: ChatRequest):
+    """AI chatbot — answers questions about AI tools, compatibility, and setup."""
+    try:
+        # Generate session ID if not provided
+        session_id = request.session_id or str(__import__('uuid').uuid4())
+
+        # Get cached tools data for context injection
+        tools_data = cache.get("all_tools") or []
+
+        # Get chatbot response
+        reply = chatbot.chat(
+            message=request.message,
+            session_id=session_id,
+            tools_data=tools_data
+        )
+
+        return {
+            "success": True,
+            "reply": reply,
+            "session_id": session_id
+        }
+
+    except Exception as e:
+        print(f"❌ Chat error: {e}")
+        return {
+            "success": False,
+            "reply": "Sorry, I encountered an error. Please try again.",
+            "error": str(e)
+        }
+
+
+@app.get("/api/chat/suggestions")
+def chat_suggestions():
+    """Get suggested starter questions for the chatbot."""
+    return {
+        "success": True,
+        "suggestions": chatbot.get_suggestions()
+    }
 
 
 if __name__ == "__main__":

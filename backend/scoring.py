@@ -8,16 +8,17 @@ class AIToolScorer:
     Intelligent scoring system for AI tools based on:
     - Bayesian Confidence (shrinks noisy data based on sample size)
     - Z-Score Anomaly Detection (mathematically detects outlier growth)
-    - Weighted Metrics (Growth, Activity, Community, Freshness)
+    - Weighted Metrics (Growth, Activity, Community, Freshness, Adoption)
     """
     
     def __init__(self):
         # Weights for the core ranking
         self.weights = {
-            "GrowthRate": 0.50,      # Growth is the primary signal
-            "Activity": 0.25,         # Development momentum matters
+            "GrowthRate": 0.45,      # Growth is the primary signal
+            "Activity": 0.20,         # Development momentum matters
             "CommunityStrength": 0.10, # Less important for discovery than growth
-            "Freshness": 0.15         # Recency matters
+            "Freshness": 0.15,        # Recency matters
+            "Adoption": 0.10          # Real-world usage (HF downloads)
         }
         
         # Star-based booster tiers (PRIMARY: guarantees small repo discovery)
@@ -65,6 +66,7 @@ class AIToolScorer:
         df["open_issues"] = df["open_issues"].fillna(0) if "open_issues" in df.columns else 0
         df["star_growth_estimate"] = df["star_growth_estimate"].fillna(df["stars"] * 0.1) if "star_growth_estimate" in df.columns else df["stars"] * 0.1
         df["days_since_last_release"] = df["days_since_last_release"].fillna(30) if "days_since_last_release" in df.columns else 30
+        df["downloads_hf"] = df["downloads_hf"].fillna(0) if "downloads_hf" in df.columns else 0
         
         # Raw Growth Rate: Rate of growth relative to size
         raw_growth = df["star_growth_estimate"] / (np.log10(df["stars"] + 10))
@@ -90,6 +92,11 @@ class AIToolScorer:
         # Freshness: Exponential decay favors very recent updates
         df["Freshness"] = np.exp(-df["days_since_last_release"] / 30)
         
+        # Adoption: Real-world usage signal from HF downloads
+        # Log-scaled because downloads range from 0 to billions
+        # GitHub repos get 0 here (no download data), HF models benefit
+        df["Adoption"] = np.log10(df["downloads_hf"] + 1)
+        
         return df
     
     
@@ -98,7 +105,7 @@ class AIToolScorer:
         Step 2: Min-Max Normalization
         Scales all features to 0-1 range for fair comparison
         """
-        features = ["GrowthRate", "Activity", "CommunityStrength", "Freshness"]
+        features = ["GrowthRate", "Activity", "CommunityStrength", "Freshness", "Adoption"]
         
         for feature in features:
             min_val = df[feature].min()
@@ -115,13 +122,14 @@ class AIToolScorer:
     def calculate_weighted_score(self, df):
         """
         Step 3: Apply Weighted Formula
-        FinalScore = 0.5(Growth) + 0.25(Activity) + 0.10(Community) + 0.15(Freshness)
+        FinalScore = 0.45(Growth) + 0.20(Activity) + 0.10(Community) + 0.15(Freshness) + 0.10(Adoption)
         """
         df["FinalScore"] = (
             self.weights["GrowthRate"] * df["GrowthRate_N"] +
             self.weights["Activity"] * df["Activity_N"] +
             self.weights["CommunityStrength"] * df["CommunityStrength_N"] +
-            self.weights["Freshness"] * df["Freshness_N"]
+            self.weights["Freshness"] * df["Freshness_N"] +
+            self.weights["Adoption"] * df["Adoption_N"]
         )
         return df
     
@@ -222,7 +230,7 @@ class AIToolScorer:
     def get_top_tools(self, df_ranked, n=10):
         """Get top N tools"""
         columns = [
-            "name", "stars", "forks", "contributors_count",
+            "name", "stars", "forks", "contributors_count", "downloads_hf",
             "FinalScore", "BoostedScore", "IsBoosted", "GrowthZScore", "url"
         ]
         available_cols = [c for c in columns if c in df_ranked.columns]

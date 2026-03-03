@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>AI Discovery - Navigation</title>
     <style>
@@ -11,12 +12,14 @@
             background: #0F1419;
             color: white;
         }
+
         .card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             padding: 30px;
             border-radius: 15px;
             margin: 20px 0;
         }
+
         a {
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -27,22 +30,31 @@
             margin: 10px 10px 10px 0;
             font-weight: bold;
         }
+
         a:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(102,126,234,0.5);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
         }
+
         .status {
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
         }
-        .online { background: #10b981; }
-        .offline { background: #ef4444; }
+
+        .online {
+            background: #10b981;
+        }
+
+        .offline {
+            background: #ef4444;
+        }
     </style>
 </head>
+
 <body>
     <h1>🚀 AI Discovery Platform</h1>
-    
+
     <div class="card">
         <h2>Backend Status</h2>
         <div id="status" class="status">Checking...</div>
@@ -67,16 +79,17 @@
     <script>
         async function checkBackend() {
             try {
-                const response = await fetch('http://localhost:8000/');
+                const response = await fetch('/api/rankings?query=ai&limit=1');
                 const data = await response.json();
-                document.getElementById('status').innerHTML = 
+                document.getElementById('status').innerHTML =
                     `<span class="online">✅ Backend Online - ${data.message}</span>`;
             } catch (error) {
-                document.getElementById('status').innerHTML = 
+                document.getElementById('status').innerHTML =
                     `<span class="offline">❌ Backend Offline - Please run: cd backend && python main.py</span>`;
             }
         }
         checkBackend();
     </script>
 </body>
+
 </html>

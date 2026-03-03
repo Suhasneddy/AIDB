@@ -1,28 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discover AI Tools - AIDB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0F1419; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        .filter-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .repo-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(99,102,241,0.3); }
-        .boost-badge { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0d14;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-btn {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .repo-card {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease;
+        }
+
+        .repo-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .boost-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        }
+
+        .gem-card {
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gem-card:hover {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: scale(1.05);
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tier-hidden-gem {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        }
+
+        .tier-rising-star {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        }
+
+        .tier-trending {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+        }
+
+        .tier-anomaly {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Skeleton */
+        .skeleton {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            animation: skeletonPulse 2s ease infinite;
+        }
+
+        @keyframes skeletonPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 3px;
+        }
+
+        /* Navbar scroll */
+        header {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        header.scrolled {
+            background: rgba(10, 13, 20, 0.9) !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="text-white">
     <!-- Header -->
-    <header class="glass sticky top-0 z-50 border-b border-white/10">
+    <header id="discoverNav" class="glass sticky top-0 z-50 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                AIDB
-            </a>
-            <div class="flex gap-4">
-                <a href="index.html" class="px-4 py-2 glass rounded-lg hover:bg-white/10">Home</a>
-                <a href="discover.html" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">Discover</a>
+            <a href="index.html"
+                class="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">AIDB</a>
+            <div class="flex gap-3">
+                <a href="index.html"
+                    class="px-4 py-2 glass rounded-lg hover:bg-white/10 transition-all duration-300">Home</a>
+                <a href="discover.html"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">Discover</a>
+                <a href="chatbot.html"
+                    class="px-4 py-2 glass rounded-lg hover:bg-white/10 transition-all duration-300">🤖 AI Assistant</a>
             </div>
         </div>
     </header>
@@ -37,9 +186,10 @@
                     <div class="text-2xl font-bold" id="totalCount">0</div>
                     <div class="text-sm text-gray-400">Total Tools</div>
                 </div>
-                <div class="glass px-6 py-3 rounded-xl">
+                <div class="glass gem-card px-6 py-3 rounded-xl" onclick="showHiddenGems()"
+                    title="Click to see all boosted tools">
                     <div class="text-2xl font-bold text-yellow-500" id="boostedCount">0</div>
-                    <div class="text-sm text-gray-400">Hidden Gems</div>
+                    <div class="text-sm text-gray-400">🔥 Hidden Gems <span class="text-xs">(click)</span></div>
                 </div>
             </div>
         </div>
@@ -50,20 +200,28 @@
                 <h2 class="text-xl font-bold">Filters</h2>
                 <button onclick="resetFilters()" class="text-sm text-blue-400 hover:text-blue-300">Reset All</button>
             </div>
-            
+
             <!-- Category Filter -->
             <div class="mb-6">
                 <label class="block text-sm font-semibold mb-3">Category</label>
                 <div class="flex flex-wrap gap-2" id="categoryFilters">
-                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-category="all">All</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="llm">🤖 LLMs</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="image-generation">🎨 Image Gen</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="video-ai">🎬 Video AI</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="audio-ai">🎵 Audio AI</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="code-ai">💻 Code AI</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="computer-vision">👁️ Vision</button>
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition"
+                        data-category="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="llm">🤖
+                        LLMs</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="image-generation">🎨
+                        Image Gen</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="video-ai">🎬 Video
+                        AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="audio-ai">🎵 Audio
+                        AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="code-ai">💻 Code
+                        AI</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="computer-vision">👁️
+                        Vision</button>
                     <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="nlp">💬 NLP</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="machine-learning">🧠 ML</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-category="machine-learning">🧠
+                        ML</button>
                 </div>
             </div>
 
@@ -71,7 +229,8 @@
             <div class="mb-6">
                 <label class="block text-sm font-semibold mb-3">Show Results</label>
                 <div class="flex gap-2">
-                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-limit="20">Top 20</button>
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-limit="20">Top
+                        20</button>
                     <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-limit="30">Top 30</button>
                     <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-limit="50">Top 50</button>
                 </div>
@@ -81,10 +240,13 @@
             <div>
                 <label class="block text-sm font-semibold mb-3">Sort By</label>
                 <div class="flex gap-2">
-                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-sort="score">🏆 Score</button>
+                    <button class="filter-btn active px-4 py-2 rounded-lg glass transition" data-sort="score">🏆
+                        Score</button>
                     <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="stars">⭐ Stars</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="growth">📈 Growth</button>
-                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="fresh">🔥 Freshness</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="growth">📈
+                        Growth</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg glass transition" data-sort="fresh">🔥
+                        Freshness</button>
                 </div>
             </div>
         </div>
@@ -113,7 +275,7 @@
     </div>
 
     <script>
-        const API_URL = 'https://ai-discovery.onrender.com';
+        const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
         let allTools = [];
         let currentCategory = 'all';
         let currentLimit = 20;
@@ -125,7 +287,7 @@
             // Get search query from URL
             const urlParams = new URLSearchParams(window.location.search);
             searchQuery = urlParams.get('q') || '';
-            
+
             setupFilterListeners();
             await loadTools();
         }
@@ -169,7 +331,7 @@
             try {
                 const response = await fetch(`${API_URL}/api/rankings?query=ai&limit=100`);
                 const data = await response.json();
-                
+
                 if (data.success) {
                     allTools = data.data;
                     document.getElementById('totalCount').textContent = allTools.length;
@@ -239,7 +401,7 @@
 
         // Sort tools
         function sortTools(tools, sortBy) {
-            switch(sortBy) {
+            switch (sortBy) {
                 case 'stars':
                     return tools.sort((a, b) => (b.stars || 0) - (a.stars || 0));
                 case 'growth':
@@ -264,7 +426,7 @@
             const noResults = document.getElementById('noResults');
 
             loading.classList.add('hidden');
-            
+
             if (tools.length === 0) {
                 results.classList.add('hidden');
                 noResults.classList.remove('hidden');
@@ -278,7 +440,7 @@
             grid.innerHTML = tools.map((tool, idx) => {
                 // Calculate score based on current sort
                 let displayScore, scoreLabel;
-                switch(currentSort) {
+                switch (currentSort) {
                     case 'stars':
                         displayScore = Math.min((tool.stars || 0) / 10000, 10); // Normalize to 0-10 scale
                         scoreLabel = 'Stars';
@@ -297,7 +459,7 @@
                         displayScore = (tool.BoostedScore || 0) * 10;
                         scoreLabel = 'Score';
                 }
-                
+
                 return `
                 <div class="repo-card glass rounded-xl p-6 transition-all duration-300 cursor-pointer" onclick="window.open('${tool.url}', '_blank')">
                     <div class="flex items-start justify-between mb-4">
@@ -324,9 +486,9 @@
 
                     <div class="flex items-center justify-between">
                         <div class="flex gap-2 flex-wrap">
-                            ${(tool.topics || []).slice(0, 3).map(tag => 
-                                `<span class="text-xs px-2 py-1 rounded-md bg-white/5 text-gray-400">${tag}</span>`
-                            ).join('')}
+                            ${(tool.topics || []).slice(0, 3).map(tag =>
+                    `<span class="text-xs px-2 py-1 rounded-md bg-white/5 text-gray-400">${tag}</span>`
+                ).join('')}
                         </div>
                         <div class="text-xs text-gray-500">
                             Growth: ${((tool.GrowthRate_N || 0) * 100).toFixed(0)}%
@@ -342,18 +504,131 @@
             currentCategory = 'all';
             currentLimit = 20;
             currentSort = 'score';
-            
+
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector('[data-category="all"]').classList.add('active');
             document.querySelector('[data-limit="20"]').classList.add('active');
             document.querySelector('[data-sort="score"]').classList.add('active');
             document.getElementById('currentSort').textContent = '🏆 Score';
-            
+
             filterAndDisplay();
+        }
+
+        // Show Hidden Gems modal
+        function showHiddenGems() {
+            const boosted = allTools.filter(t => t.IsBoosted);
+            if (boosted.length === 0) {
+                alert('No boosted tools found yet. Wait for data to load.');
+                return;
+            }
+
+            // Group by tier
+            const tiers = {};
+            boosted.forEach(tool => {
+                const tier = tool.BoostTier || 'Unknown';
+                if (!tiers[tier]) tiers[tier] = [];
+                tiers[tier].push(tool);
+            });
+
+            const tierColors = {
+                'Hidden Gem': 'tier-hidden-gem',
+                'Rising Star': 'tier-rising-star',
+                'Trending': 'tier-trending',
+                'Anomaly': 'tier-anomaly'
+            };
+            const tierEmojis = {
+                'Hidden Gem': '💎',
+                'Rising Star': '⭐',
+                'Trending': '📈',
+                'Anomaly': '🔬'
+            };
+
+            let html = '';
+            for (const [tier, tools] of Object.entries(tiers)) {
+                const css = tierColors[tier] || 'bg-gray-600';
+                const emoji = tierEmojis[tier] || '🏷️';
+                html += `<div class="mb-5">`;
+                html += `<div class="flex items-center gap-2 mb-3"><span class="tier-badge ${css}">${emoji} ${tier}</span><span class="text-xs text-gray-400">${tools.length} tools</span></div>`;
+                html += `<div class="space-y-2">`;
+                tools.sort((a, b) => (b.BoostedScore || 0) - (a.BoostedScore || 0));
+                tools.forEach(tool => {
+                    const score = ((tool.BoostedScore || 0) * 10).toFixed(1);
+                    const zs = (tool.GrowthZScore || 0).toFixed(1);
+                    html += `
+                        <div class="flex items-center justify-between glass rounded-lg px-4 py-2 hover:bg-white/10 cursor-pointer" onclick="window.open('${tool.url}', '_blank')">
+                            <div>
+                                <span class="font-semibold text-blue-400">${tool.name}</span>
+                                <span class="text-xs text-gray-500 ml-2">⭐${(tool.stars || 0).toLocaleString()}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-yellow-500 font-bold">${score}</span>
+                                <span class="text-xs text-gray-500 ml-1">Z:${zs}</span>
+                            </div>
+                        </div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            document.getElementById('gemsList').innerHTML = html;
+            document.getElementById('gemsModal').classList.remove('hidden');
+        }
+
+        function closeGemsModal() {
+            document.getElementById('gemsModal').classList.add('hidden');
         }
 
         // Initialize on load
         init();
+
+        // ─── IntersectionObserver for scroll reveals ───
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); revealObserver.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ─── Navbar scroll ───
+        window.addEventListener('scroll', () => {
+            document.getElementById('discoverNav').classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // ─── Stagger cards when grid updates ───
+        const gridObserver = new MutationObserver(() => {
+            const cards = document.querySelectorAll('#repoGrid > div');
+            cards.forEach((card, i) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(24px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, Math.min(i * 60, 600));
+            });
+        });
+        const grid = document.getElementById('repoGrid');
+        if (grid) gridObserver.observe(grid, { childList: true });
     </script>
+
+    <!-- Hidden Gems Modal -->
+    <div id="gemsModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center"
+        onclick="if(event.target===this)closeGemsModal()">
+        <div
+            class="glass rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto border border-yellow-500/30">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-yellow-500">🔥 Boosted Tools</h2>
+                <button onclick="closeGemsModal()"
+                    class="text-gray-400 hover:text-white text-2xl transition-colors duration-300">&times;</button>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Tools boosted by the hybrid algorithm (Bayesian + Z-Score). Grouped by
+                boost tier.</p>
+            <div id="gemsList"></div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <a href="chatbot.html" title="Ask AI Assistant"
+        style="position:fixed;bottom:24px;right:24px;z-index:999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;box-shadow:0 8px 30px rgba(99,102,241,0.4);transition:all 0.3s cubic-bezier(0.16,1,0.3,1);"
+        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a>
+
 </body>
+
 </html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDB - AI Assistant</title>
+    <meta name="description"
+        content="Ask the AIDB AI Assistant about device compatibility, setup instructions, and AI tools.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#6366f1',
+                        'secondary': '#8b5cf6',
+                        'accent': '#ec4899',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.5s ease-out',
+                        'typing': 'typing 1.4s ease-in-out infinite',
+                        'pulse-ring': 'pulseRing 2s ease-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        typing: {
+                            '0%, 100%': { opacity: '0.3' },
+                            '50%': { opacity: '1' },
+                        },
+                        pulseRing: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0.7' },
+                            '100%': { transform: 'scale(1.8)', opacity: '0' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0F1419;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .gradient-mesh {
+            background:
+                #0F1419,
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
+        }
+
+        /* Chat message styling */
+        .msg-user {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .msg-bot {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Markdown rendering inside bot messages */
+        .bot-content h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0.75rem 0 0.4rem;
+            color: #c4b5fd;
+        }
+
+        .bot-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.3rem;
+            color: #a78bfa;
+        }
+
+        .bot-content p {
+            margin: 0.3rem 0;
+            line-height: 1.6;
+        }
+
+        .bot-content ul,
+        .bot-content ol {
+            margin: 0.3rem 0 0.3rem 1.2rem;
+        }
+
+        .bot-content li {
+            margin: 0.15rem 0;
+            line-height: 1.5;
+        }
+
+        .bot-content code {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.85em;
+            color: #c4b5fd;
+        }
+
+        .bot-content pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .bot-content pre code {
+            background: none;
+            padding: 0;
+            color: #e2e8f0;
+            font-size: 0.85em;
+        }
+
+        .bot-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0;
+            font-size: 0.9em;
+        }
+
+        .bot-content th,
+        .bot-content td {
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bot-content th {
+            color: #c4b5fd;
+            font-weight: 600;
+        }
+
+        .bot-content strong {
+            color: #e2e8f0;
+        }
+
+        .bot-content a {
+            color: #818cf8;
+            text-decoration: underline;
+        }
+
+        /* Typing indicator */
+        .typing-dot {
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Custom scrollbar */
+        #chatMessages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatMessages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 3px;
+        }
+
+        #chatMessages::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body class="gradient-mesh min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-strong animate-slide-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition">
+                        </div>
+                        <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
+                            <span class="material-icons text-white text-2xl">auto_awesome</span>
+                        </div>
+                    </div>
+                    <span
+                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                        AIDB
+                    </span>
+                </a>
+
+                <!-- Nav Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="index.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Home</a>
+                    <a href="discover.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Discover</a>
+                    <a href="rankings.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Rankings</a>
+                    <a href="compare.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Compare</a>
+                    <a href="chatbot.html"
+                        class="text-sm font-semibold text-white hover:text-primary transition-colors flex items-center gap-1">
+                        <span class="material-icons text-sm">smart_toy</span>AI Assistant</a>
+                </div>
+
+                <!-- CTA -->
+                <div class="flex items-center gap-4">
+                    <a href="discover.html"
+                        class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all hover:scale-105">
+                        Discover Tools
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Chat Container -->
+    <div class="flex-1 flex flex-col max-w-4xl w-full mx-auto pt-24 pb-4 px-4">
+
+        <!-- Chat Header -->
+        <div class="text-center mb-6 animate-fade-in">
+            <div class="inline-flex items-center justify-center mb-4">
+                <div class="relative">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-2xl blur-xl opacity-40 animate-pulse">
+                    </div>
+                    <div
+                        class="relative w-16 h-16 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl flex items-center justify-center">
+                        <span class="material-icons text-white text-3xl">smart_toy</span>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black text-white mb-2">AIDB AI Assistant</h1>
+            <p class="text-gray-400 text-sm">Ask about device compatibility, setup guides, tool comparisons & more</p>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 mb-4 px-2"
+            style="min-height: 400px; max-height: calc(100vh - 340px);">
+            <!-- Welcome message -->
+            <div class="flex gap-3 animate-fade-in">
+                <div
+                    class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                    <span class="material-icons text-white text-sm">smart_toy</span>
+                </div>
+                <div class="msg-bot rounded-2xl rounded-tl-md p-4 max-w-[85%]">
+                    <p class="text-gray-200 text-sm leading-relaxed">
+                        👋 Hi! I'm your <strong>AIDB Assistant</strong>. I can help you with:
+                    </p>
+                    <ul class="text-gray-300 text-sm mt-2 space-y-1 ml-4 list-disc">
+                        <li><strong>Device compatibility</strong> — What hardware you need to run AI tools</li>
+                        <li><strong>Setup & installation</strong> — Step-by-step guides for any tool</li>
+                        <li><strong>Tool comparisons</strong> — Side-by-side analysis</li>
+                        <li><strong>General questions</strong> — About any AI tool on AIDB</li>
+                    </ul>
+                    <p class="text-gray-400 text-xs mt-3">Try one of the suggestions below, or ask your own question!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div id="suggestionChips" class="flex flex-wrap gap-2 ml-11 animate-fade-in" style="animation-delay: 0.3s;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="glass-strong rounded-2xl p-3 animate-slide-up">
+            <div class="flex items-end gap-3">
+                <div class="flex-1 relative">
+                    <textarea id="chatInput" placeholder="Ask about AI tools, compatibility, setup..." rows="1"
+                        class="w-full bg-transparent border-none text-white placeholder-gray-500 text-sm py-3 px-4 focus:outline-none resize-none"
+                        style="max-height: 120px;" onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"></textarea>
+                </div>
+                <button id="sendBtn" onclick="sendMessage()"
+                    class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white flex items-center justify-center transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <span class="material-icons">send</span>
+                </button>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-gray-600 mt-2">Powered by Groq • Responses may contain inaccuracies</p>
+    </div>
+
+    <script>
+        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
+        const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
+
+        let sessionId = localStorage.getItem('aidb_chat_session') || generateSessionId();
+        let isLoading = false;
+
+        function generateSessionId() {
+            const id = 'sess_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('aidb_chat_session', id);
+            return id;
+        }
+
+        // ─── Load suggestions ─────────────────────────────────────
+        async function loadSuggestions() {
+            const container = document.getElementById('suggestionChips');
+            const defaultSuggestions = [
+                "What GPU do I need for Stable Diffusion?",
+                "How do I install LangChain?",
+                "Can I run LLaMA on 8GB RAM?",
+                "Top trending AI tools right now",
+                "Compare PyTorch vs TensorFlow",
+                "Setup Whisper for speech recognition"
+            ];
+
+            try {
+                const res = await fetch(`${API_URL}/api/chat/suggestions`);
+                const data = await res.json();
+                const suggestions = data.success ? data.suggestions : defaultSuggestions;
+                renderSuggestions(suggestions, container);
+            } catch {
+                renderSuggestions(defaultSuggestions, container);
+            }
+        }
+
+        function renderSuggestions(suggestions, container) {
+            container.innerHTML = suggestions.map(s => `
+                <button onclick="askSuggestion('${s.replace(/'/g, "\\'")}')"
+                    class="px-4 py-2 glass rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all hover:scale-105 cursor-pointer">
+                    ${s}
+                </button>
+            `).join('');
+        }
+
+        function askSuggestion(text) {
+            document.getElementById('chatInput').value = text;
+            // Hide suggestions after clicking
+            document.getElementById('suggestionChips').style.display = 'none';
+            sendMessage();
+        }
+
+        // ─── Send message ─────────────────────────────────────────
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message || isLoading) return;
+
+            isLoading = true;
+            document.getElementById('sendBtn').disabled = true;
+            input.value = '';
+            autoResize(input);
+
+            // Add user message
+            addMessage(message, 'user');
+
+            // Show typing indicator
+            const typingId = showTypingIndicator();
+
+            try {
+                const res = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, session_id: sessionId })
+                });
+
+                const data = await res.json();
+
+                // Remove typing indicator
+                removeTypingIndicator(typingId);
+
+                if (data.success) {
+                    addMessage(data.reply, 'bot');
+                    if (data.session_id) sessionId = data.session_id;
+                } else {
+                    addMessage(data.reply || 'Sorry, something went wrong. Please try again.', 'bot');
+                }
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('⚠️ Unable to connect to the AI backend. Make sure the server is running.', 'bot');
+            }
+
+            isLoading = false;
+            document.getElementById('sendBtn').disabled = false;
+            input.focus();
+        }
+
+        // ─── Add message to chat ──────────────────────────────────
+        function addMessage(content, type) {
+            const container = document.getElementById('chatMessages');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-3 animate-fade-in ${type === 'user' ? 'justify-end' : ''}`;
+
+            if (type === 'user') {
+                wrapper.innerHTML = `
+                    <div class="msg-user rounded-2xl rounded-tr-md p-4 max-w-[85%]">
+                        <p class="text-white text-sm leading-relaxed">${escapeHtml(content)}</p>
+                    </div>
+                    <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-accent to-primary flex items-center justify-center">
+                        <span class="material-icons text-white text-sm">person</span>
+                    </div>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                        <span class="material-icons text-white text-sm">smart_toy</span>
+                    </div>
+                    <div class="msg-bot rounded-2xl rounded-tl-md p-4 max-w-[85%]">
+                        <div class="bot-content text-gray-200 text-sm leading-relaxed">${renderMarkdown(content)}</div>
+                    </div>
+                `;
+            }
+
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ─── Typing indicator ─────────────────────────────────────
+        function showTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const id = 'typing-' + Date.now();
+            const el = document.createElement('div');
+            el.id = id;
+            el.className = 'flex gap-3 animate-fade-in';
+            el.innerHTML = `
+                <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                    <span class="material-icons text-white text-sm">smart_toy</span>
+                </div>
+                <div class="msg-bot rounded-2xl rounded-tl-md px-5 py-4 flex items-center gap-1.5">
+                    <div class="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-secondary rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-accent rounded-full typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(el);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        // ─── Markdown renderer (lightweight) ─────────────────────
+        function renderMarkdown(text) {
+            if (!text) return '';
+            let html = escapeHtml(text);
+
+            // Code blocks (```...```)
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+
+            // Inline code
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Bold
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+            // Italic
+            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+            // Headers
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+
+            // Unordered lists
+            html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+            // Ordered lists
+            html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+            // Links
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+            // Tables (basic)
+            html = html.replace(/\|(.+)\|/g, (match) => {
+                const cells = match.split('|').filter(c => c.trim());
+                if (cells.every(c => c.trim().match(/^[-:]+$/))) return ''; // separator row
+                const tag = 'td';
+                return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+            });
+            html = html.replace(/(<tr>.*<\/tr>)/s, '<table>$1</table>');
+
+            // Line breaks
+            html = html.replace(/\n\n/g, '</p><p>');
+            html = html.replace(/\n/g, '<br>');
+
+            // Wrap in paragraph if not already
+            if (!html.startsWith('<')) html = '<p>' + html + '</p>';
+
+            return html;
+        }
+
+        // ─── Utilities ────────────────────────────────────────────
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        // ─── Init ─────────────────────────────────────────────────
+        loadSuggestions();
+    </script>
+
+</body>
+
+</html>

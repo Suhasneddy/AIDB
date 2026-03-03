@@ -253,7 +253,7 @@
 
     <script>
         // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
-        const API_URL = 'https://ai-discovery.onrender.com';
+        const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
 
         async function loadToolDetails() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -374,6 +374,12 @@
 
         loadToolDetails();
     </script>
+
+    <!-- Floating Chat Button -->
+    <a href="chatbot.html" title="Ask AI Assistant"
+        style="position:fixed;bottom:80px;right:24px;z-index:999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;text-decoration:none;box-shadow:0 8px 30px rgba(99,102,241,0.4);transition:transform 0.2s;"
+        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a>
+
 </body>
 
 </html>

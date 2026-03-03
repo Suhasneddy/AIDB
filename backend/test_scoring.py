@@ -34,6 +34,21 @@ test_repos = [
         "stars": 8500, "forks": 1200, "contributors_count": 45,
         "commits_last_month": 250, "total_commits": 1800,
         "star_growth_estimate": 180, "days_since_last_release": 2
+    },
+    # Hugging Face models with downloads
+    {
+        "name": "🤗 PopularHFModel (High Downloads)",
+        "likes_hf": 5000, "downloads_hf": 50000000,
+        "forks": 200, "contributors_count": 30,
+        "commits_last_month": 40, "total_commits": 500,
+        "star_growth_estimate": 100, "days_since_last_release": 5
+    },
+    {
+        "name": "🤗 NicheHFModel (Low Downloads)",
+        "likes_hf": 200, "downloads_hf": 5000,
+        "forks": 10, "contributors_count": 3,
+        "commits_last_month": 20, "total_commits": 80,
+        "star_growth_estimate": 60, "days_since_last_release": 10
     }
 ]
 

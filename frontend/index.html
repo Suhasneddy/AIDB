@@ -53,84 +53,290 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0F1419;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Glassmorphism */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0d14;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ─── Glassmorphism ─── */
         .glass {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .glass-strong {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        /* Gradient backgrounds */
+        /* ─── Gradient Mesh Background ─── */
         .gradient-mesh {
-            background:
-                #0F1419,
-                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
+            background: #0a0d14;
+            position: relative;
         }
 
-        /* Card hover effects */
+        .gradient-mesh::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(99, 102, 241, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 60% at 80% 20%, rgba(139, 92, 246, 0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 80% at 10% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Animated Gradient Orbs ─── */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            will-change: transform;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: #6366f1;
+            top: -10%;
+            left: -5%;
+            animation-duration: 25s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: #8b5cf6;
+            bottom: -10%;
+            right: -5%;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: #ec4899;
+            top: 50%;
+            left: 40%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(40px, -60px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-30px, 40px) scale(0.95);
+            }
+
+            75% {
+                transform: translate(50px, 20px) scale(1.05);
+            }
+        }
+
+        /* ─── Scroll Reveal System ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            transform: translateX(-60px);
+        }
+
+        .reveal-left.revealed {
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            transform: translateX(60px);
+        }
+
+        .reveal-right.revealed {
+            transform: translateX(0);
+        }
+
+        .reveal-scale {
+            transform: scale(0.85);
+        }
+
+        .reveal-scale.revealed {
+            transform: scale(1);
+        }
+
+        /* Stagger delays */
+        .stagger-1 {
+            transition-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            transition-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            transition-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            transition-delay: 0.4s;
+        }
+
+        /* ─── Card Hover Effects ─── */
         .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
         }
 
         .hover-lift:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 60px -10px rgba(99, 102, 241, 0.3);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 60px -15px rgba(99, 102, 241, 0.35);
         }
 
-        /* Shimmer effect */
-        .shimmer {
-            background: linear-gradient(90deg,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.1) 50%,
-                    rgba(255, 255, 255, 0) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
+        /* ─── Glow border on hover ─── */
+        .glow-border {
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Hide scrollbar */
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0), rgba(99, 102, 241, 0));
+            transition: background 0.5s ease;
+            z-index: -1;
         }
 
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .glow-border:hover::before {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.2));
         }
 
-        /* Gradient text */
+        /* ─── Gradient text ─── */
         .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
+        /* ─── Navbar scroll effect ─── */
+        nav {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Star rating */
+        nav.scrolled {
+            background: rgba(10, 13, 20, 0.85) !important;
+            backdrop-filter: blur(30px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        nav.scrolled .nav-inner {
+            height: 64px !important;
+        }
+
+        /* ─── Shimmer loading ─── */
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* ─── Skeleton pulse ─── */
+        .skeleton {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            animation: skeletonPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes skeletonPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ─── Star rating ─── */
         .star-fill {
             color: #fbbf24;
         }
 
-        /* Progress bar animation */
+        /* ─── Smooth counters ─── */
+        .counter {
+            display: inline-block;
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        /* ─── Progress bar animation ─── */
         .progress-bar {
-            animation: progressFill 1s ease-out forwards;
+            animation: progressFill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes progressFill {
@@ -138,54 +344,103 @@
                 width: 0;
             }
         }
+
+        /* ─── Hero title reveal ─── */
+        .hero-word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px) rotateX(40deg);
+            animation: heroReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes heroReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg);
+            }
+        }
+
+        /* ─── Floating animation ─── */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* ─── Gradient border animation ─── */
+        @keyframes borderGlow {
+
+            0%,
+            100% {
+                border-color: rgba(99, 102, 241, 0.3);
+            }
+
+            50% {
+                border-color: rgba(139, 92, 246, 0.5);
+            }
+        }
     </style>
 </head>
 
-<body class="gradient-mesh">
+<body class="gradient-mesh text-white">
+
+    <!-- Animated Gradient Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-strong animate-slide-up">
+    <nav id="mainNav" class="fixed top-0 w-full z-50 glass-strong">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="nav-inner flex justify-between items-center h-20 transition-all duration-500">
                 <!-- Logo -->
                 <a href="index.html" class="flex items-center gap-3 group">
                     <div class="relative">
                         <div
-                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition">
+                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition-opacity duration-500">
                         </div>
                         <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
                             <span class="material-icons text-white text-2xl">auto_awesome</span>
                         </div>
                     </div>
                     <span
-                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                        AIDB
-                    </span>
+                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">AIDB</span>
                 </a>
 
                 <!-- Nav Links -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="index.html"
-                        class="text-sm font-semibold text-white hover:text-primary transition-colors">Home</a>
+                        class="text-sm font-semibold text-white hover:text-primary transition-colors duration-300">Home</a>
                     <a href="discover.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Discover</a>
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Discover</a>
                     <a href="rankings.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Rankings</a>
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Rankings</a>
                     <a href="compare.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors">Compare</a>
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Compare</a>
+                    <a href="chatbot.html"
+                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-1">
+                        <span class="material-icons text-sm">smart_toy</span>AI Assistant</a>
                 </div>
 
-                <!-- Search & CTA -->
+                <!-- CTA -->
                 <div class="flex items-center gap-4">
                     <a href="discover.html"
-                        class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all hover:scale-105">
+                        class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all duration-300 hover:scale-105">
                         Discover Tools
                     </a>
-                    <button onclick="showLoginModal()" class="px-4 py-2 glass rounded-xl hover:bg-white/10 transition font-semibold text-white">
+                    <button onclick="showLoginModal()"
+                        class="px-4 py-2 glass rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold text-white">
                         Login
-                    </button>
-                    <button class="p-3 glass rounded-xl hover:bg-white/10 transition">
-                        <span class="material-icons text-white">person</span>
                     </button>
                 </div>
             </div>
@@ -193,19 +448,12 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <!-- Animated Background -->
-        <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-            <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float"
-                style="animation-delay: 2s;"></div>
-            <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-float"
-                style="animation-delay: 4s;"></div>
-        </div>
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" id="heroSection">
 
-        <div class="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto animate-fade-in">
+        <div class="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto" id="heroContent">
             <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-8 animate-scale-in">
+            <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-8 hero-word"
+                style="animation-delay:0s">
                 <span class="relative flex h-2 w-2">
                     <span
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -215,56 +463,59 @@
             </div>
 
             <!-- Main Heading -->
-            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
-                <span class="block text-white">Discover</span>
-                <span class="block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight" style="perspective:1000px">
+                <span class="hero-word block text-white" style="animation-delay:0.15s">Discover</span>
+                <span
+                    class="hero-word block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent"
+                    style="animation-delay:0.3s">
                     50+ AI Tools
                 </span>
             </h1>
 
-            <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-                The most comprehensive AI tools directory. Find, compare, and integrate the perfect AI solution
-                for your needs.
+            <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed hero-word"
+                style="animation-delay:0.45s">
+                The most comprehensive AI tools directory. Find, compare, and integrate the perfect AI solution for your
+                needs.
             </p>
 
             <!-- Search Bar -->
-            <div class="max-w-3xl mx-auto mb-8">
+            <div class="max-w-3xl mx-auto mb-10 hero-word" style="animation-delay:0.6s">
                 <div
-                    class="glass-strong rounded-2xl p-2 flex items-center gap-3 hover:shadow-2xl hover:shadow-primary/20 transition-all">
+                    class="glass-strong rounded-2xl p-2 flex items-center gap-3 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 focus-within:border-primary/40">
                     <span class="material-icons text-gray-400 ml-4 text-3xl">search</span>
                     <input type="text" id="heroSearch" placeholder="Search for ChatGPT, Midjourney, Claude..."
-                        class="flex-1 bg-transparent border-none text-white placeholder-gray-400 text-lg py-4 focus:outline-none"
+                        class="flex-1 bg-transparent border-none text-white placeholder-gray-500 text-lg py-4 focus:outline-none"
                         onkeypress="if(event.key==='Enter') performHeroSearch()">
                     <button onclick="performHeroSearch()"
-                        class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
+                        class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all duration-300 hover:scale-105 active:scale-95">
                         Search
                     </button>
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div class="glass rounded-xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-white mb-1">50+</div>
-                    <div class="text-sm text-gray-400">AI Tools</div>
+            <!-- Stats with counter animation -->
+            <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto hero-word" style="animation-delay:0.75s">
+                <div class="glass rounded-2xl p-6 hover-lift glow-border">
+                    <div class="text-3xl font-black text-white mb-1 counter" data-target="413" data-suffix="+">0+</div>
+                    <div class="text-sm text-gray-500 font-medium">AI Tools</div>
                 </div>
-                <div class="glass rounded-xl p-6 hover-lift">
-                    <div class="text-3xl font-black text-white mb-1">10+</div>
-                    <div class="text-sm text-gray-400">Categories</div>
+                <div class="glass rounded-2xl p-6 hover-lift glow-border">
+                    <div class="text-3xl font-black text-white mb-1 counter" data-target="10" data-suffix="+">0+</div>
+                    <div class="text-sm text-gray-500 font-medium">Categories</div>
                 </div>
-                <div class="glass rounded-xl p-6 hover-lift">
+                <div class="glass rounded-2xl p-6 hover-lift glow-border">
                     <div class="text-3xl font-black text-white mb-1">Daily</div>
-                    <div class="text-sm text-gray-400">Updates</div>
+                    <div class="text-sm text-gray-500 font-medium">Updates</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Main Content -->
-    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-20">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-24">
 
         <!-- Trending Section -->
-        <section class="animate-slide-up">
+        <section class="reveal">
             <div class="flex items-center justify-between mb-10">
                 <div>
                     <div class="flex items-center gap-3 mb-2">
@@ -274,18 +525,17 @@
                     <p class="text-gray-400">The hottest AI tools right now</p>
                 </div>
                 <a href="rankings.html"
-                    class="px-6 py-3 glass rounded-xl hover:bg-white/10 text-primary font-semibold transition-all hover:scale-105">
+                    class="px-6 py-3 glass rounded-xl hover:bg-white/10 text-primary font-semibold transition-all duration-300 hover:scale-105">
                     View All →
                 </a>
             </div>
 
             <div id="trendingContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Loading placeholder -->
-                <div class="col-span-full text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary">
-                    </div>
-                    <p class="text-gray-400 mt-4">Loading trending tools...</p>
-                </div>
+                <!-- Skeleton loading -->
+                <div class="skeleton h-72 rounded-2xl"></div>
+                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.1s"></div>
+                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.2s"></div>
+                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.3s"></div>
             </div>
         </section>
 
@@ -293,7 +543,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             <!-- Top 10 Section -->
-            <section class="lg:col-span-2">
+            <section class="lg:col-span-2 reveal">
                 <div class="flex items-center justify-between mb-8">
                     <div>
                         <h2 class="text-3xl font-black text-white mb-2">🏆 Top 10 AI Tools</h2>
@@ -301,7 +551,7 @@
                     </div>
                     <div class="flex gap-2">
                         <button
-                            class="px-4 py-2 glass rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition">Month</button>
+                            class="px-4 py-2 glass rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300">Month</button>
                         <button
                             class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold">All
                             Time</button>
@@ -309,27 +559,22 @@
                 </div>
 
                 <div id="top10Container" class="space-y-4">
-                    <div class="text-center py-12">
-                        <div
-                            class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary">
-                        </div>
-                    </div>
+                    <div class="skeleton h-20 rounded-xl mb-3"></div>
+                    <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.1s"></div>
+                    <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.2s"></div>
                 </div>
             </section>
 
             <!-- Open Source Sidebar -->
-            <section>
+            <section class="reveal stagger-2">
                 <div class="mb-8">
                     <h2 class="text-2xl font-black text-white mb-2">⚡ Open Source</h2>
                     <p class="text-gray-400 text-sm">Popular on GitHub</p>
                 </div>
 
                 <div id="openSourceContainer" class="space-y-4">
-                    <div class="text-center py-12">
-                        <div
-                            class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary">
-                        </div>
-                    </div>
+                    <div class="skeleton h-44 rounded-xl mb-3"></div>
+                    <div class="skeleton h-44 rounded-xl mb-3" style="animation-delay:0.15s"></div>
                 </div>
             </section>
 
@@ -338,8 +583,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="relative z-10 border-t border-white/10 mt-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer class="relative z-10 border-t border-white/10 mt-20 reveal">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                 <div class="col-span-2">
                     <div class="flex items-center gap-3 mb-4">
@@ -348,36 +593,41 @@
                         </div>
                         <span class="text-xl font-black text-white">AIDB</span>
                     </div>
-                    <p class="text-gray-400 text-sm mb-4">Discover, compare, and integrate the best AI tools for your
+                    <p class="text-gray-500 text-sm mb-4">Discover, compare, and integrate the best AI tools for your
                         projects.</p>
                 </div>
                 <div>
                     <h5 class="font-bold text-white mb-4">Platform</h5>
-                    <nav class="flex flex-col gap-2 text-sm text-gray-400">
-                        <a href="rankings.html" class="hover:text-primary transition">Rankings</a>
-                        <a href="categories.html" class="hover:text-primary transition">Categories</a>
-                        <a href="compare.html" class="hover:text-primary transition">Compare</a>
+                    <nav class="flex flex-col gap-3 text-sm text-gray-400">
+                        <a href="rankings.html" class="hover:text-primary transition-colors duration-300">Rankings</a>
+                        <a href="categories.html"
+                            class="hover:text-primary transition-colors duration-300">Categories</a>
+                        <a href="compare.html" class="hover:text-primary transition-colors duration-300">Compare</a>
+                        <a href="chatbot.html" class="hover:text-primary transition-colors duration-300">AI
+                            Assistant</a>
                     </nav>
                 </div>
                 <div>
                     <h5 class="font-bold text-white mb-4">Newsletter</h5>
                     <div class="flex gap-2">
                         <input type="email" placeholder="Email"
-                            class="flex-1 glass rounded-lg px-3 py-2 text-sm text-white">
-                        <button class="bg-primary p-2 rounded-lg hover:bg-primary/80 transition">
+                            class="flex-1 glass rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all duration-300">
+                        <button
+                            class="bg-primary p-2 rounded-lg hover:bg-primary/80 transition-all duration-300 hover:scale-105 active:scale-95">
                             <span class="material-icons text-sm">send</span>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="pt-8 border-t border-white/10 text-center text-sm text-gray-500">
+            <div class="pt-8 border-t border-white/10 text-center text-sm text-gray-600">
                 © 2024 AIDB. Mini Project Demo.
             </div>
         </div>
     </footer>
 
     <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div id="loginModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
         <div class="glass-strong rounded-2xl p-8 max-w-md w-full mx-4 animate-scale-in">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
@@ -388,24 +638,29 @@
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Email</label>
-                    <input type="email" required class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary" placeholder="your@email.com">
+                    <input type="email" required
+                        class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
+                        placeholder="your@email.com">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Password</label>
-                    <input type="password" required class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary" placeholder="••••••••">
+                    <input type="password" required
+                        class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
+                        placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
+                <button type="submit"
+                    class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
                     Login
                 </button>
             </form>
-            <p class="text-center text-sm text-gray-400 mt-4">Don't have an account? <a href="#" class="text-primary hover:text-secondary">Sign up</a></p>
+            <p class="text-center text-sm text-gray-400 mt-4">Don't have an account? <a href="#"
+                    class="text-primary hover:text-secondary">Sign up</a></p>
         </div>
     </div>
 
     <script>
-        // ⚡ CHANGE THIS to your Render.com URL after deploying backend!
-        // Example: const API_URL = 'https://ai-tool-discovery-api.onrender.com';
-        const API_URL = 'https://ai-discovery.onrender.com';
+        // Auto-detect: use localhost:8000 for local dev, same origin for Vercel
+        const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
         const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
         // Cache
@@ -430,7 +685,7 @@
                     const emojis = ['🎨', '🤖', '🎬', '🎵', '⚡', '🔥', '✨', '💎'];
 
                     container.innerHTML = data.data.slice(0, 4).map((tool, idx) => `
-                <div class="glass-strong rounded-2xl overflow-hidden hover-lift cursor-pointer group" 
+                <div class="glass-strong rounded-2xl overflow-hidden hover-lift glow-border cursor-pointer group" 
                      onclick="window.location.href='tool.html?tool=${encodeURIComponent(tool.full_name)}'">
                     <div class="relative aspect-video bg-gradient-to-br from-primary via-secondary to-accent p-8 flex items-center justify-center overflow-hidden">
                         <div class="absolute inset-0 bg-black/20"></div>
@@ -441,15 +696,16 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        <h3 class="font-bold text-xl text-white mb-2 group-hover:text-primary transition">${tool.name}</h3>
+                        <h3 class="font-bold text-xl text-white mb-2 group-hover:text-primary transition-colors duration-300">${tool.name}</h3>
                         <p class="text-sm text-gray-400 line-clamp-2 mb-4">${(tool.description || '').substring(0, 100)}...</p>
                         <div class="flex items-center justify-between">
                             <span class="px-3 py-1 glass rounded-full text-xs font-semibold text-gray-300">${tool.language || 'AI'}</span>
-                            <span class="text-primary font-semibold text-sm group-hover:translate-x-1 transition">View →</span>
+                            <span class="text-primary font-semibold text-sm group-hover:translate-x-1 transition-transform duration-300">View →</span>
                         </div>
                     </div>
                 </div>
             `).join('');
+                    staggerCards(container);
                 }
             } catch (error) {
                 console.error(error);
@@ -469,7 +725,7 @@
                         const color = colors[idx % colors.length];
                         const rating = (tool.BoostedScore * 10).toFixed(1);
                         return `
-                    <div class="glass-strong rounded-xl p-5 hover-lift cursor-pointer group" 
+                    <div class="glass-strong rounded-xl p-5 hover-lift glow-border cursor-pointer group" 
                          onclick="window.location.href='tool.html?tool=${encodeURIComponent(tool.full_name)}'">
                         <div class="flex items-center gap-4">
                             <div class="text-4xl font-black" style="background: linear-gradient(135deg, ${color}, ${color}80); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -479,7 +735,7 @@
                                 ${tool.name.substring(0, 1)}
                             </div>
                             <div class="flex-1">
-                                <h4 class="font-bold text-white text-lg group-hover:text-primary transition">${tool.name}</h4>
+                                <h4 class="font-bold text-white text-lg group-hover:text-primary transition-colors duration-300">${tool.name}</h4>
                                 <div class="flex items-center gap-2 mt-1">
                                     <div class="flex text-yellow-400">
                                         ${'★'.repeat(Math.floor(rating / 2))}${'☆'.repeat(5 - Math.floor(rating / 2))}
@@ -488,7 +744,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="px-4 py-2 glass rounded-lg font-semibold text-primary group-hover:bg-primary group-hover:text-white transition">
+                                <div class="px-4 py-2 glass rounded-lg font-semibold text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
                                     View
                                 </div>
                             </div>
@@ -496,6 +752,7 @@
                     </div>
                 `;
                     }).join('');
+                    staggerCards(container);
                 }
             } catch (error) {
                 console.error(error);
@@ -511,8 +768,8 @@
                     const container = document.getElementById('openSourceContainer');
 
                     container.innerHTML = data.data.slice(0, 3).map(repo => `
-                <div class="glass-strong rounded-xl p-5 hover-lift cursor-pointer">
-                    <h4 class="font-bold text-white mb-2 hover:text-primary transition">${repo.full_name || repo.name}</h4>
+                <div class="glass-strong rounded-xl p-5 hover-lift glow-border cursor-pointer">
+                    <h4 class="font-bold text-white mb-2 hover:text-primary transition-colors duration-300">${repo.full_name || repo.name}</h4>
                     <p class="text-sm text-gray-400 mb-4 line-clamp-2">${(repo.description || '').substring(0, 80)}...</p>
                     <div class="flex items-center gap-4 text-xs text-gray-500 mb-4">
                         <span class="flex items-center gap-1">
@@ -521,11 +778,12 @@
                         </span>
                         ${repo.language ? `<span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-primary"></div>${repo.language}</span>` : ''}
                     </div>
-                    <button onclick="window.open('${repo.url}', '_blank')" class="w-full py-2 glass rounded-lg text-sm font-semibold hover:bg-white/10 transition">
+                    <button onclick="window.open('${repo.url}', '_blank')" class="w-full py-2 glass rounded-lg text-sm font-semibold hover:bg-white/10 transition-all duration-300">
                         View Code
                     </button>
                 </div>
             `).join('');
+                    staggerCards(container);
                 }
             } catch (error) {
                 console.error(error);
@@ -554,17 +812,88 @@
         // Load on page load
         loadAllData();
 
-        // Add scroll animations
-        window.addEventListener('scroll', () => {
-            document.querySelectorAll('.animate-on-scroll').forEach(el => {
-                const rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight * 0.8) {
-                    el.classList.add('animate-slide-up');
+        // ─── IntersectionObserver Scroll Reveals ───
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
                 }
             });
-        });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ─── Navbar Scroll Effect ───
+        const nav = document.getElementById('mainNav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            if (y > 80) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+            lastScroll = y;
+        }, { passive: true });
+
+        // ─── Counter Animation ───
+        function animateCounters() {
+            document.querySelectorAll('.counter[data-target]').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                const suffix = el.dataset.suffix || '';
+                const duration = 2000;
+                const start = performance.now();
+
+                function update(now) {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease out cubic
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const current = Math.floor(ease * target);
+                    el.textContent = current.toLocaleString() + suffix;
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            });
+        }
+        // Start counters when they come into view
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('.counter[data-target]').forEach(el => counterObserver.observe(el));
+
+        // ─── Staggered Card Entrance ───
+        function staggerCards(container) {
+            const cards = container.children;
+            for (let i = 0; i < cards.length; i++) {
+                cards[i].style.opacity = '0';
+                cards[i].style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    cards[i].style.transition = 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+                    cards[i].style.opacity = '1';
+                    cards[i].style.transform = 'translateY(0)';
+                }, i * 100);
+            }
+        }
     </script>
 
+    <!-- Floating Chat Button -->
+    <a href="chatbot.html" id="chatFloatingBtn" class="fixed bottom-6 right-6 z-50 group" title="Ask AI Assistant">
+        <div
+            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-50 group-hover:opacity-75 transition animate-pulse">
+        </div>
+        <div
+            class="relative w-14 h-14 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40 hover:scale-110 transition-all">
+            <span class="material-icons text-white text-2xl">smart_toy</span>
+        </div>
+        <div
+            class="absolute -top-10 right-0 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">
+            Ask AI Assistant
+        </div>
+    </a>
 </body>
 
 </html>
