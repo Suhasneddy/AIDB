@@ -37,39 +37,37 @@ class ChatBot:
     Supports both Groq (gsk_ keys) and xAI/Grok (xai- keys) automatically."""
 
     def __init__(self):
-        api_key = os.getenv("GROQ_API_KEY")
         self.client = None
         self.provider = None  # 'groq' or 'xai'
+        self.model = None
 
-        if not api_key:
-            print("⚠️  GROQ_API_KEY not found in .env — chatbot will return fallback responses")
-        elif api_key.startswith("xai-"):
-            # xAI/Grok API — uses OpenAI-compatible endpoint
-            try:
-                from openai import OpenAI
-                self.client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
-                self.provider = "xai"
-                self.model = "grok-3-mini-fast"
-                print("✅ Chatbot initialized with xAI/Grok API")
-            except ImportError:
-                print("⚠️  openai package not installed — installing...")
-                import subprocess
-                subprocess.check_call(["pip", "install", "openai"])
-                from openai import OpenAI
-                self.client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
-                self.provider = "xai"
-                self.model = "grok-3-mini-fast"
-                print("✅ Chatbot initialized with xAI/Grok API (after installing openai)")
-        else:
-            # Groq API
-            try:
-                from groq import Groq
-                self.client = Groq(api_key=api_key)
-                self.provider = "groq"
-                self.model = "llama-3.3-70b-versatile"
-                print("✅ Chatbot initialized with Groq API")
-            except Exception as e:
-                print(f"⚠️  Failed to initialize Groq client: {e}")
+        try:
+            api_key = os.getenv("GROQ_API_KEY")
+
+            if not api_key:
+                print("⚠️  GROQ_API_KEY not found — chatbot will return fallback responses")
+            elif api_key.startswith("xai-"):
+                # xAI/Grok API — uses OpenAI-compatible endpoint
+                try:
+                    from openai import OpenAI
+                    self.client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
+                    self.provider = "xai"
+                    self.model = "grok-3-mini-fast"
+                    print("✅ Chatbot initialized with xAI/Grok API")
+                except Exception as e:
+                    print(f"⚠️  Failed to initialize xAI client: {e}")
+            else:
+                # Groq API
+                try:
+                    from groq import Groq
+                    self.client = Groq(api_key=api_key)
+                    self.provider = "groq"
+                    self.model = "llama-3.3-70b-versatile"
+                    print("✅ Chatbot initialized with Groq API")
+                except Exception as e:
+                    print(f"⚠️  Failed to initialize Groq client: {e}")
+        except Exception as e:
+            print(f"⚠️  Chatbot init error (will use fallback): {e}")
 
         # In-memory session store: session_id -> list of messages
         self.sessions: Dict[str, List[Dict]] = {}
