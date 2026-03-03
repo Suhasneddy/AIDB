@@ -101,8 +101,10 @@ def _preload_data():
             for key, value in record.items():
                 if hasattr(value, 'isoformat'):  # datetime object
                     clean_record[key] = value.isoformat()
-                elif isinstance(value, (np.integer, np.floating)):
-                    clean_record[key] = float(value)
+                elif hasattr(value, 'item') and isinstance(value, (int, float)):
+                    clean_record[key] = value.item()
+                elif type(value).__module__ == 'numpy' and hasattr(value, 'item'):
+                    clean_record[key] = value.item()
                 elif isinstance(value, np.ndarray):
                     clean_record[key] = value.tolist()
                 elif value is None or (isinstance(value, float) and np.isnan(value)):
