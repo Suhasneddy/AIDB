@@ -61,7 +61,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0d14;
+            background: #0b0f1a;
             overflow-x: hidden;
         }
 
@@ -84,7 +84,7 @@
 
         /* ─── Gradient Mesh Background ─── */
         .gradient-mesh {
-            background: #0a0d14;
+            background: #0b0f1a;
             position: relative;
         }
 
@@ -389,6 +389,229 @@
                 border-color: rgba(139, 92, 246, 0.5);
             }
         }
+
+        /* ─── Scroll-Driven Logo Video ─── */
+        #scrollContainer {
+            height: 500vh;
+            position: relative;
+        }
+
+        #logoVideoFixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: #0b0f1a;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #logoVideoFixed.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #logoVideoFixed::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40%;
+            height: 40%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            animation: logoGlow 4s ease-in-out infinite;
+        }
+
+        #logoCanvas {
+            max-width: 350px;
+            width: 60vw;
+            height: auto;
+            pointer-events: none;
+        }
+
+        /* Loading progress ring */
+        .load-progress {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .load-progress circle {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .load-progress .track {
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+
+        .load-progress .fill {
+            stroke: url(#loadGrad);
+            stroke-dasharray: 157;
+            stroke-dashoffset: 157;
+            transition: stroke-dashoffset 0.15s linear;
+            transform-origin: center;
+            transform: rotate(-90deg);
+        }
+
+        .load-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 50px));
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        @keyframes logoGlow {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+        }
+
+        /* Scroll progress indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.6;
+            transition: opacity 0.4s ease;
+        }
+
+        .scroll-indicator span {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .scroll-indicator .arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            transform: rotate(45deg);
+            animation: scrollArrow 1.8s ease-in-out infinite;
+        }
+
+        @keyframes scrollArrow {
+
+            0%,
+            100% {
+                transform: rotate(45deg) translate(0, 0);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: rotate(45deg) translate(5px, 5px);
+                opacity: 1;
+            }
+        }
+
+        /* Scroll progress bar */
+        #scrollProgress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+            z-index: 200;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Content wrapper — hidden initially */
+        #contentWrapper {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        #contentWrapper.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Nav hidden initially */
+        #mainNav {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        #mainNav.nav-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .hero-title-main {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s,
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+        }
+
+        .hero-subtitle-main {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s,
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+        }
+
+        #contentWrapper.revealed .hero-title-main,
+        #contentWrapper.revealed .hero-subtitle-main {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .logo-video {
+                max-width: 220px;
+            }
+
+            .scroll-indicator span {
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 
@@ -399,264 +622,259 @@
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <!-- Navigation -->
-    <nav id="mainNav" class="fixed top-0 w-full z-50 glass-strong">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="nav-inner flex justify-between items-center h-20 transition-all duration-500">
-                <!-- Logo -->
-                <a href="index.html" class="flex items-center gap-3 group">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition-opacity duration-500">
-                        </div>
-                        <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
-                            <span class="material-icons text-white text-2xl">auto_awesome</span>
-                        </div>
-                    </div>
-                    <span
-                        class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">AIDB</span>
-                </a>
+    <!-- ═══ Scroll-Driven Logo Video Section ═══ -->
+    <div id="scrollContainer">
+        <!-- Fixed video overlay -->
+        <div id="logoVideoFixed">
+            <!-- Hidden video for frame extraction -->
+            <video id="logoVideo" muted playsinline disablePictureInPicture preload="auto" style="display:none;">
+                <source src="../Logo.webm" type="video/webm">
+            </video>
+            <!-- Canvas for instant frame rendering -->
+            <canvas id="logoCanvas"></canvas>
+            <!-- Loading indicator -->
+            <svg class="load-progress" id="loadProgress" viewBox="0 0 54 54">
+                <defs>
+                    <linearGradient id="loadGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#6366f1" />
+                        <stop offset="100%" stop-color="#ec4899" />
+                    </linearGradient>
+                </defs>
+                <circle class="track" cx="27" cy="27" r="25" />
+                <circle class="fill" id="loadFill" cx="27" cy="27" r="25" />
+            </svg>
+            <span class="load-label" id="loadLabel">Loading...</span>
+            <div class="scroll-indicator" id="scrollIndicator" style="opacity:0;">
+                <span>Scroll to explore</span>
+                <div class="arrow"></div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Nav Links -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="index.html"
-                        class="text-sm font-semibold text-white hover:text-primary transition-colors duration-300">Home</a>
-                    <a href="discover.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Discover</a>
-                    <a href="rankings.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Rankings</a>
-                    <a href="compare.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Compare</a>
-                    <a href="chatbot.html"
-                        class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-1">
-                        <span class="material-icons text-sm">smart_toy</span>AI Assistant</a>
-                </div>
+    <!-- Scroll progress bar -->
+    <div id="scrollProgress"></div>
 
-                <!-- CTA -->
-                <div class="flex items-center gap-4">
-                    <a href="discover.html"
-                        class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all duration-300 hover:scale-105">
-                        Discover Tools
+    <!-- ═══ Content Wrapper (hidden until video completes) ═══ -->
+    <div id="contentWrapper">
+
+        <!-- Navigation -->
+        <nav id="mainNav" class="fixed top-0 w-full z-50 glass-strong">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="nav-inner flex justify-between items-center h-20 transition-all duration-500">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center gap-3 group">
+                        <div class="relative">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition-opacity duration-500">
+                            </div>
+                            <div class="relative bg-gradient-to-r from-primary to-secondary p-2.5 rounded-xl">
+                                <span class="material-icons text-white text-2xl">auto_awesome</span>
+                            </div>
+                        </div>
+                        <span
+                            class="text-2xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">AIDB</span>
                     </a>
-                    <button onclick="showLoginModal()"
-                        class="px-4 py-2 glass rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold text-white">
-                        Login
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" id="heroSection">
-
-        <div class="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto" id="heroContent">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full mb-8 hero-word"
-                style="animation-delay:0s">
-                <span class="relative flex h-2 w-2">
-                    <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span class="text-sm font-medium text-gray-300">Discover the future of AI</span>
-            </div>
-
-            <!-- Main Heading -->
-            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight" style="perspective:1000px">
-                <span class="hero-word block text-white" style="animation-delay:0.15s">Discover</span>
-                <span
-                    class="hero-word block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent"
-                    style="animation-delay:0.3s">
-                    50+ AI Tools
-                </span>
-            </h1>
-
-            <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed hero-word"
-                style="animation-delay:0.45s">
-                The most comprehensive AI tools directory. Find, compare, and integrate the perfect AI solution for your
-                needs.
-            </p>
-
-            <!-- Search Bar -->
-            <div class="max-w-3xl mx-auto mb-10 hero-word" style="animation-delay:0.6s">
-                <div
-                    class="glass-strong rounded-2xl p-2 flex items-center gap-3 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 focus-within:border-primary/40">
-                    <span class="material-icons text-gray-400 ml-4 text-3xl">search</span>
-                    <input type="text" id="heroSearch" placeholder="Search for ChatGPT, Midjourney, Claude..."
-                        class="flex-1 bg-transparent border-none text-white placeholder-gray-500 text-lg py-4 focus:outline-none"
-                        onkeypress="if(event.key==='Enter') performHeroSearch()">
-                    <button onclick="performHeroSearch()"
-                        class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all duration-300 hover:scale-105 active:scale-95">
-                        Search
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats with counter animation -->
-            <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto hero-word" style="animation-delay:0.75s">
-                <div class="glass rounded-2xl p-6 hover-lift glow-border">
-                    <div class="text-3xl font-black text-white mb-1 counter" data-target="413" data-suffix="+">0+</div>
-                    <div class="text-sm text-gray-500 font-medium">AI Tools</div>
-                </div>
-                <div class="glass rounded-2xl p-6 hover-lift glow-border">
-                    <div class="text-3xl font-black text-white mb-1 counter" data-target="10" data-suffix="+">0+</div>
-                    <div class="text-sm text-gray-500 font-medium">Categories</div>
-                </div>
-                <div class="glass rounded-2xl p-6 hover-lift glow-border">
-                    <div class="text-3xl font-black text-white mb-1">Daily</div>
-                    <div class="text-sm text-gray-500 font-medium">Updates</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-24">
-
-        <!-- Trending Section -->
-        <section class="reveal">
-            <div class="flex items-center justify-between mb-10">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="material-icons text-accent text-3xl">local_fire_department</span>
-                        <h2 class="text-4xl font-black text-white">Trending This Week</h2>
+                    <!-- Nav Links -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <a href="index.html"
+                            class="text-sm font-semibold text-white hover:text-primary transition-colors duration-300">Home</a>
+                        <a href="discover.html"
+                            class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Discover</a>
+                        <a href="rankings.html"
+                            class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Rankings</a>
+                        <a href="compare.html"
+                            class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300">Compare</a>
+                        <a href="chatbot.html"
+                            class="text-sm font-semibold text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-1">
+                            <span class="material-icons text-sm">smart_toy</span>AI Assistant</a>
                     </div>
-                    <p class="text-gray-400">The hottest AI tools right now</p>
-                </div>
-                <a href="rankings.html"
-                    class="px-6 py-3 glass rounded-xl hover:bg-white/10 text-primary font-semibold transition-all duration-300 hover:scale-105">
-                    View All →
-                </a>
-            </div>
 
-            <div id="trendingContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Skeleton loading -->
-                <div class="skeleton h-72 rounded-2xl"></div>
-                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.1s"></div>
-                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.2s"></div>
-                <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.3s"></div>
-            </div>
-        </section>
-
-        <!-- Top Rankings & Open Source Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Top 10 Section -->
-            <section class="lg:col-span-2 reveal">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 class="text-3xl font-black text-white mb-2">🏆 Top 10 AI Tools</h2>
-                        <p class="text-gray-400">Based on our growth algorithm</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button
-                            class="px-4 py-2 glass rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300">Month</button>
-                        <button
-                            class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold">All
-                            Time</button>
-                    </div>
-                </div>
-
-                <div id="top10Container" class="space-y-4">
-                    <div class="skeleton h-20 rounded-xl mb-3"></div>
-                    <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.1s"></div>
-                    <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.2s"></div>
-                </div>
-            </section>
-
-            <!-- Open Source Sidebar -->
-            <section class="reveal stagger-2">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-black text-white mb-2">⚡ Open Source</h2>
-                    <p class="text-gray-400 text-sm">Popular on GitHub</p>
-                </div>
-
-                <div id="openSourceContainer" class="space-y-4">
-                    <div class="skeleton h-44 rounded-xl mb-3"></div>
-                    <div class="skeleton h-44 rounded-xl mb-3" style="animation-delay:0.15s"></div>
-                </div>
-            </section>
-
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="relative z-10 border-t border-white/10 mt-20 reveal">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-                <div class="col-span-2">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl">
-                            <span class="material-icons text-white">auto_awesome</span>
-                        </div>
-                        <span class="text-xl font-black text-white">AIDB</span>
-                    </div>
-                    <p class="text-gray-500 text-sm mb-4">Discover, compare, and integrate the best AI tools for your
-                        projects.</p>
-                </div>
-                <div>
-                    <h5 class="font-bold text-white mb-4">Platform</h5>
-                    <nav class="flex flex-col gap-3 text-sm text-gray-400">
-                        <a href="rankings.html" class="hover:text-primary transition-colors duration-300">Rankings</a>
-                        <a href="categories.html"
-                            class="hover:text-primary transition-colors duration-300">Categories</a>
-                        <a href="compare.html" class="hover:text-primary transition-colors duration-300">Compare</a>
-                        <a href="chatbot.html" class="hover:text-primary transition-colors duration-300">AI
-                            Assistant</a>
-                    </nav>
-                </div>
-                <div>
-                    <h5 class="font-bold text-white mb-4">Newsletter</h5>
-                    <div class="flex gap-2">
-                        <input type="email" placeholder="Email"
-                            class="flex-1 glass rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all duration-300">
-                        <button
-                            class="bg-primary p-2 rounded-lg hover:bg-primary/80 transition-all duration-300 hover:scale-105 active:scale-95">
-                            <span class="material-icons text-sm">send</span>
+                    <!-- CTA -->
+                    <div class="flex items-center gap-4">
+                        <a href="discover.html"
+                            class="hidden md:block px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-semibold transition-all duration-300 hover:scale-105">
+                            Discover Tools
+                        </a>
+                        <button onclick="showLoginModal()"
+                            class="px-4 py-2 glass rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold text-white">
+                            Login
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="pt-8 border-t border-white/10 text-center text-sm text-gray-600">
-                © 2024 AIDB. Mini Project Demo.
-            </div>
-        </div>
-    </footer>
+        </nav>
 
-    <!-- Login Modal -->
-    <div id="loginModal"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-        <div class="glass-strong rounded-2xl p-8 max-w-md w-full mx-4 animate-scale-in">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
-                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-white">
-                    <span class="material-icons">close</span>
-                </button>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" id="heroSection"
+            style="background: linear-gradient(180deg, #0b0f1a 0%, #020617 100%);">
+
+            <div class="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto" id="heroContent">
+
+                <!-- Heading -->
+                <h1
+                    class="hero-title-main text-5xl md:text-7xl font-black mb-4 leading-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    Toolscope AI
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="hero-subtitle-main text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                    Discover and rank the best AI repositories.
+                </p>
+
             </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">Email</label>
-                    <input type="email" required
-                        class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
-                        placeholder="your@email.com">
+        </section>
+
+        <!-- Main Content -->
+        <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-24">
+
+            <!-- Trending Section -->
+            <section class="reveal">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="material-icons text-accent text-3xl">local_fire_department</span>
+                            <h2 class="text-4xl font-black text-white">Trending This Week</h2>
+                        </div>
+                        <p class="text-gray-400">The hottest AI tools right now</p>
+                    </div>
+                    <a href="rankings.html"
+                        class="px-6 py-3 glass rounded-xl hover:bg-white/10 text-primary font-semibold transition-all duration-300 hover:scale-105">
+                        View All →
+                    </a>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">Password</label>
-                    <input type="password" required
-                        class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
-                        placeholder="••••••••">
+
+                <div id="trendingContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Skeleton loading -->
+                    <div class="skeleton h-72 rounded-2xl"></div>
+                    <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.1s"></div>
+                    <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.2s"></div>
+                    <div class="skeleton h-72 rounded-2xl" style="animation-delay:0.3s"></div>
                 </div>
-                <button type="submit"
-                    class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
-                    Login
-                </button>
-            </form>
-            <p class="text-center text-sm text-gray-400 mt-4">Don't have an account? <a href="#"
-                    class="text-primary hover:text-secondary">Sign up</a></p>
+            </section>
+
+            <!-- Top Rankings & Open Source Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- Top 10 Section -->
+                <section class="lg:col-span-2 reveal">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-white mb-2">🏆 Top 10 AI Tools</h2>
+                            <p class="text-gray-400">Based on our growth algorithm</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button
+                                class="px-4 py-2 glass rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300">Month</button>
+                            <button
+                                class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold">All
+                                Time</button>
+                        </div>
+                    </div>
+
+                    <div id="top10Container" class="space-y-4">
+                        <div class="skeleton h-20 rounded-xl mb-3"></div>
+                        <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.1s"></div>
+                        <div class="skeleton h-20 rounded-xl mb-3" style="animation-delay:0.2s"></div>
+                    </div>
+                </section>
+
+                <!-- Open Source Sidebar -->
+                <section class="reveal stagger-2">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-black text-white mb-2">⚡ Open Source</h2>
+                        <p class="text-gray-400 text-sm">Popular on GitHub</p>
+                    </div>
+
+                    <div id="openSourceContainer" class="space-y-4">
+                        <div class="skeleton h-44 rounded-xl mb-3"></div>
+                        <div class="skeleton h-44 rounded-xl mb-3" style="animation-delay:0.15s"></div>
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="relative z-10 border-t border-white/10 mt-20 reveal">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl">
+                                <span class="material-icons text-white">auto_awesome</span>
+                            </div>
+                            <span class="text-xl font-black text-white">AIDB</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-4">Discover, compare, and integrate the best AI tools for
+                            your
+                            projects.</p>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-white mb-4">Platform</h5>
+                        <nav class="flex flex-col gap-3 text-sm text-gray-400">
+                            <a href="rankings.html"
+                                class="hover:text-primary transition-colors duration-300">Rankings</a>
+                            <a href="categories.html"
+                                class="hover:text-primary transition-colors duration-300">Categories</a>
+                            <a href="compare.html" class="hover:text-primary transition-colors duration-300">Compare</a>
+                            <a href="chatbot.html" class="hover:text-primary transition-colors duration-300">AI
+                                Assistant</a>
+                        </nav>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-white mb-4">Newsletter</h5>
+                        <div class="flex gap-2">
+                            <input type="email" placeholder="Email"
+                                class="flex-1 glass rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all duration-300">
+                            <button
+                                class="bg-primary p-2 rounded-lg hover:bg-primary/80 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <span class="material-icons text-sm">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-8 border-t border-white/10 text-center text-sm text-gray-600">
+                    © 2024 AIDB. Mini Project Demo.
+                </div>
+            </div>
+        </footer>
+
+        <!-- Login Modal -->
+        <div id="loginModal"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div class="glass-strong rounded-2xl p-8 max-w-md w-full mx-4 animate-scale-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
+                    <button onclick="closeLoginModal()" class="text-gray-400 hover:text-white">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+                        <input type="email" required
+                            class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
+                            placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                        <input type="password" required
+                            class="w-full px-4 py-3 rounded-xl glass text-white placeholder-gray-400 focus:ring-2 focus:ring-primary"
+                            placeholder="••••••••">
+                    </div>
+                    <button type="submit"
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/50 text-white font-bold transition-all hover:scale-105">
+                        Login
+                    </button>
+                </form>
+                <p class="text-center text-sm text-gray-400 mt-4">Don't have an account? <a href="#"
+                        class="text-primary hover:text-secondary">Sign up</a></p>
+            </div>
         </div>
-    </div>
+
+    </div> <!-- END #contentWrapper -->
 
     <script>
         // Auto-detect: use localhost:8000 for local dev, same origin for Vercel
@@ -666,6 +884,149 @@
         // Cache
         const cache = { data: null, timestamp: null, ttl: 300000 };
 
+        // ═══════════════════════════════════════════
+        // ─── Scroll-Driven Video Controller ───
+        // ═══════════════════════════════════════════
+        const logoVideo = document.getElementById('logoVideo');
+        const logoCanvas = document.getElementById('logoCanvas');
+        const logoCtx = logoCanvas.getContext('2d');
+        const logoVideoFixed = document.getElementById('logoVideoFixed');
+        const scrollContainer = document.getElementById('scrollContainer');
+        const scrollProgress = document.getElementById('scrollProgress');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const loadProgressFill = document.getElementById('loadFill');
+        const loadLabel = document.getElementById('loadLabel');
+        const loadProgressEl = document.getElementById('loadProgress');
+        const contentWrapper = document.getElementById('contentWrapper');
+        const nav = document.getElementById('mainNav');
+
+        let frames = [];           // Array of ImageBitmap objects
+        let framesReady = false;
+        let contentRevealed = false;
+        let animationLocked = false;
+        let ticking = false;
+        let lastDrawnFrame = -1;
+        const TARGET_FPS = 30;     // Extract 30 frames per second of video
+
+        // ─── Extract all video frames into ImageBitmaps ───
+        async function extractFrames() {
+            return new Promise((resolve) => {
+                logoVideo.addEventListener('loadedmetadata', async () => {
+                    const duration = logoVideo.duration;
+                    const totalFrames = Math.ceil(duration * TARGET_FPS);
+                    const timeStep = duration / totalFrames;
+
+                    // Set canvas size to match video
+                    logoCanvas.width = logoVideo.videoWidth;
+                    logoCanvas.height = logoVideo.videoHeight;
+
+                    const extracted = [];
+                    const circumference = 157; // 2 * PI * 25
+
+                    for (let i = 0; i < totalFrames; i++) {
+                        const time = i * timeStep;
+                        await seekTo(logoVideo, time);
+
+                        // Draw to canvas and create bitmap
+                        logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+                        logoCtx.drawImage(logoVideo, 0, 0);
+                        const bitmap = await createImageBitmap(logoCanvas);
+                        extracted.push(bitmap);
+
+                        // Update loading progress
+                        const pct = (i + 1) / totalFrames;
+                        loadProgressFill.style.strokeDashoffset = circumference * (1 - pct);
+                        loadLabel.textContent = `Loading ${Math.round(pct * 100)}%`;
+                    }
+
+                    // Hide loading UI, show scroll indicator
+                    loadProgressEl.style.display = 'none';
+                    loadLabel.style.display = 'none';
+                    scrollIndicator.style.opacity = '0.6';
+
+                    // Draw first frame
+                    logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+                    logoCtx.drawImage(extracted[0], 0, 0);
+
+                    frames = extracted;
+                    framesReady = true;
+                    resolve();
+                }, { once: true });
+            });
+        }
+
+        // Helper: seek video to a time and wait for it to be ready
+        function seekTo(video, time) {
+            return new Promise(resolve => {
+                const onSeeked = () => { video.removeEventListener('seeked', onSeeked); resolve(); };
+                video.addEventListener('seeked', onSeeked);
+                video.currentTime = time;
+            });
+        }
+
+        // Start extraction immediately
+        extractFrames();
+
+        // ─── Scroll handler — draws pre-extracted frames instantly ───
+        function updateFrame() {
+            if (!framesReady || animationLocked) { ticking = false; return; }
+
+            const scrollTop = window.scrollY;
+            const containerHeight = scrollContainer.offsetHeight - window.innerHeight;
+            if (containerHeight <= 0) { ticking = false; return; }
+
+            const progress = Math.min(Math.max(scrollTop / containerHeight, 0), 1);
+            const frameIndex = Math.min(Math.floor(progress * frames.length), frames.length - 1);
+
+            // Only redraw if frame changed (very cheap check)
+            if (frameIndex !== lastDrawnFrame) {
+                logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+                logoCtx.drawImage(frames[frameIndex], 0, 0);
+                lastDrawnFrame = frameIndex;
+            }
+
+            // Update progress bar
+            scrollProgress.style.width = (progress * 100) + '%';
+
+            // Fade scroll indicator
+            scrollIndicator.style.opacity = progress > 0.05 ? '0' : '0.6';
+
+            // Reveal content at ~95%
+            if (progress >= 0.95 && !contentRevealed) {
+                contentRevealed = true;
+                animationLocked = true;
+                logoVideoFixed.classList.add('fade-out');
+                contentWrapper.classList.add('revealed');
+                nav.classList.add('nav-visible');
+                scrollProgress.style.opacity = '0';
+
+                setTimeout(() => {
+                    scrollContainer.style.height = '0';
+                    scrollContainer.style.overflow = 'hidden';
+                    logoVideoFixed.style.display = 'none';
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    // Free memory — release all bitmaps
+                    frames.forEach(bmp => bmp.close());
+                    frames = [];
+                }, 800);
+            }
+
+            ticking = false;
+        }
+
+        function handleScrollVideo() {
+            if (animationLocked) return;
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(updateFrame);
+            }
+        }
+
+        window.addEventListener('scroll', handleScrollVideo, { passive: true });
+
+        // ═══════════════════════════════════════════
+        // ─── Data Loading ───
+        // ═══════════════════════════════════════════
         async function loadAllData() {
             if (cache.data && cache.timestamp && (Date.now() - cache.timestamp < cache.ttl)) {
                 displayCachedData();
@@ -824,10 +1185,10 @@
 
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-        // ─── Navbar Scroll Effect ───
-        const nav = document.getElementById('mainNav');
+        // ─── Navbar Scroll Effect (after content reveal) ───
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
+            if (!contentRevealed) return;
             const y = window.scrollY;
             if (y > 80) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
@@ -845,7 +1206,6 @@
                 function update(now) {
                     const elapsed = now - start;
                     const progress = Math.min(elapsed / duration, 1);
-                    // Ease out cubic
                     const ease = 1 - Math.pow(1 - progress, 3);
                     const current = Math.floor(ease * target);
                     el.textContent = current.toLocaleString() + suffix;
